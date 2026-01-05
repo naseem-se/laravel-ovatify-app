@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
+
+@theme {
+    --color-bg: #0B0B0F;
+    --color-sidebar: #111114;
+    --color-card: #16161C;
+    --color-accent: #FF00FF;
+    --color-accent-soft: #7C3AED;
+    --color-text-muted: #9CA3AF;
+    --color-border-soft: #1F2937;
+    --color-border-light: #252525;
+    
+
+    --font-sans: "Inter", sans-serif;
+
+    --fs-12: 12px;
+    --fs-14: 14px;
+    --fs-16: 16px;
+    --fs-24: 24px;
+    --fs-32: 32px;
+}
+
+::-webkit-scrollbar {
+    width: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+}
