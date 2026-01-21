@@ -16,7 +16,6 @@ class CreatePasswordRequest extends FormRequest
     {
         return [
             'email' => 'required|exists:users,email',
-            'token' => 'required|string',
             'password' => 'required|string'
         ];
     }
