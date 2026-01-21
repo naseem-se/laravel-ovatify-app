@@ -98,6 +98,8 @@ class VerificationController extends Controller
             }
             $user->save();
 
+            $vc->delete();
+
             DB::commit();
             return response()->json(['success'=>true,'message'=>'Verified successfully', 'user' => new \App\Http\Resources\UserResource($user)]);
         } catch (\Exception $e) {

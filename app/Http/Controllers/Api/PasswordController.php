@@ -19,10 +19,12 @@ use Illuminate\Support\Facades\Cache;
 use Exception;
 use App\Events\VerificationCodeGenerated;
 use App\Http\Resources\UserResource;
+use App\Models\VerificationCode;
 
 class PasswordController extends Controller
 {
-    protected int $tokenTTLMinutes = 30;
+    protected int $otpTTLMinutes = 30;
+    protected int $otpLength = 4;
 
     public function forgot(ForgotPasswordRequest $request, SmsService $smsService)
     {
@@ -41,19 +43,17 @@ class PasswordController extends Controller
         DB::beginTransaction();
         try {
             // invalidate previous tokens
-            PasswordReset::where('email', $user->email)->where('used', false)->update(['used' => true]);
+           $code = $this->generateCode($this->otpLength);
 
-            $token = Str::random(8);
-
-            $pr = PasswordReset::create([
-                'email' => $user->email,
-                'token' => hash('sha256', $token),
-                'expires_at' => Carbon::now()->addMinutes($this->tokenTTLMinutes)
+            $vc = VerificationCode::create([
+                'user_id' => $user->id,
+                'code' => $code,
+                'type' => $data['email'] ? 'email' : 'phone',
+                'expires_at' => Carbon::now()->addMinutes($this->otpTTLMinutes)
             ]);
 
-            // send token (we'll send the raw token, store hashed)
-            $sendPayload = "Password reset token: {$token}";
-
+            $token = $code; // for simplicity using code as token
+            $sendPayload = "Your password reset code is: {$token}";
             if ($user->email) {
                 // email
                 event(new VerificationCodeGenerated($user, $token));
@@ -66,7 +66,7 @@ class PasswordController extends Controller
             // Return token identifier to client (not secure token itself) — client keeps returned temporary session (we return user_id and masked info)
             return response()->json([
                 'success' => true,
-                'message' => 'Reset token sent',
+                'message' => 'Password reset code sent.',
                 'data' => UserResource::collection(collect([$user]))
             ]);
 
@@ -109,22 +109,11 @@ class PasswordController extends Controller
     {
         $data = $request->validated();
 
-        // check session key in cache or validate token again
-        $hashedToken = hash('sha256', $data['token']);
-
-        $pr = PasswordReset::where('email', $data['email'])
-            ->where('token', $hashedToken)
-            ->where('used', false)
-            ->latest()
-            ->first();
-
-        if (!$pr || $pr->isExpired()) {
-            return response()->json(['success' => false, 'message' => 'Invalid or expired token'], 400);
-        }
-
         DB::beginTransaction();
+        
         try {
             $user = User::where('email', $data['email'])->first();
+
             if (!$user) {
                 return response()->json(['success' => false, 'message' => 'User not found'], 404);
             }
@@ -134,10 +123,6 @@ class PasswordController extends Controller
 
             // revoke all tokens for security
             $user->tokens()->delete();
-
-            PasswordReset::where('email', $pr->email)
-            ->where('token', $pr->token)
-            ->delete();
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Password updated successfully']);
@@ -149,6 +134,15 @@ class PasswordController extends Controller
                 'message' => 'Failed to update password'
             ], 500);
         }
+    }
+
+    protected function generateCode(int $len = 4): string
+    {
+        $min = (int) str_pad('1', $len, '0');
+        $max = (int) str_pad('', $len, '9') ?: (10 ** $len - 1);
+        // simple numeric code
+        $code = (string) random_int(10 ** ($len - 1), (10 ** $len) - 1);
+        return $code;
     }
 }
 

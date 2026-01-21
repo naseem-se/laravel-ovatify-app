@@ -16,7 +16,7 @@ class SignupRequest extends FormRequest
             'username' => 'required|string|min:3|max:50|unique:users,username',
             'email' => 'required|email|max:255|unique:users,email',
             'phone' => 'required|string|min:7|max:20|unique:users,phone',
-            'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()->uncompromised()],
+            'password' => ['required', 'string'],
             'role' => 'nullable|in:consumer,creator'
         ];
     }
