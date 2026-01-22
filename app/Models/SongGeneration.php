@@ -43,4 +43,12 @@ class SongGeneration extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Relationship: SongGeneration has many MarketplaceAssets
+     */
+    public function marketplaceAssets()
+    {
+        return $this->hasMany(MarketplaceAsset::class); 
+    }
+
 }

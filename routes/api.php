@@ -25,13 +25,19 @@ Route::middleware(['auth:sanctum', 'creator'])->group(function() {
    Route::prefix('creator')->group(function() {
         Route::post('generate/song', [CreatorController::class, 'generateSong']);
         Route::post('upload/video', [CreatorController::class, 'uploadVideo']);
+        Route::post('upload/video/forsale', [CreatorController::class, 'uploadMediaForSale']);
+        Route::post('upload/video/forinvestment', [CreatorController::class, 'uploadMediaForInvestment']);
+        Route::post('upload/video/forlicense', [CreatorController::class, 'uploadMediaForLicense']);
+        
         Route::post('upload/illustration', [CreatorController::class, 'uploadIllustration']);
+        Route::post('upload/illustration/forsale', [CreatorController::class, 'uploadMediaForSale']);
+        Route::post('upload/illustration/forinvestment', [CreatorController::class, 'uploadMediaForInvestment']);
+        Route::post('upload/illustration/forlicense', [CreatorController::class, 'uploadMediaForLicense']);
+
 
    });
    
 });
-
-
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::get('/user', function(Request $request) {

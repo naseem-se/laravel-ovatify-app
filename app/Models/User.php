@@ -66,5 +66,10 @@ class User extends Authenticatable
         return $this->hasMany(PasswordReset::class, 'email', 'email');
     }
 
+    public function marketplaceAssets()
+    {
+        return $this->hasMany(MarketplaceAsset::class);
+    }
+
 
 }
