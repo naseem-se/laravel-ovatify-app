@@ -28,6 +28,7 @@ class SongGeneration extends Model
         'status',
         'file_type',
         'file',
+        'taskId',
     ];
 
     // Cast metadata to array automatically

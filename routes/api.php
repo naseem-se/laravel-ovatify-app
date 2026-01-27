@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\VerificationController;
 use App\Http\Controllers\Api\PasswordController;
+use App\Http\Controllers\Consumer\ConsumerController;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use App\Http\Controllers\Creator\CreatorController;
@@ -23,7 +24,13 @@ Route::prefix('auth')->group(function() {
 Route::middleware(['auth:sanctum', 'creator'])->group(function() {
     
    Route::prefix('creator')->group(function() {
-        Route::post('generate/song', [CreatorController::class, 'generateSong']);
+        Route::post('generate/song/usingai', [CreatorController::class, 'generateSongUsingAI']);
+        Route::post('get/song/generation/status/{id}', [CreatorController::class, 'getGenerationStatus']);
+        Route::post('upload/song', [CreatorController::class, 'uploadSong']);
+        Route::post('upload/song/forsale', [CreatorController::class, 'uploadMediaForSale']);
+        Route::post('upload/song/forinvestment', [CreatorController::class, 'uploadMediaForInvestment']);
+        Route::post('upload/song/forlicense', [CreatorController::class, 'uploadMediaForLicense']);
+
         Route::post('upload/video', [CreatorController::class, 'uploadVideo']);
         Route::post('upload/video/forsale', [CreatorController::class, 'uploadMediaForSale']);
         Route::post('upload/video/forinvestment', [CreatorController::class, 'uploadMediaForInvestment']);
@@ -34,9 +41,18 @@ Route::middleware(['auth:sanctum', 'creator'])->group(function() {
         Route::post('upload/illustration/forinvestment', [CreatorController::class, 'uploadMediaForInvestment']);
         Route::post('upload/illustration/forlicense', [CreatorController::class, 'uploadMediaForLicense']);
 
+        Route::post('my/tracks', [CreatorController::class, 'myTracks']);
+        Route::post('my/track/details/{id}', [CreatorController::class, 'myTrackDetails']);
+
 
    });
    
+});
+
+Route::middleware(['auth:sanctum', 'consumer'])->group(function() {
+    Route::prefix('consumer')->group(function() {
+        Route::get('dashboard', [ConsumerController::class, 'dashboard']);
+    });
 });
 
 Route::middleware('auth:sanctum')->group(function() {

@@ -26,11 +26,11 @@ class MarketplaceAsset extends Model
         'total_valuation',
         'ownership_block',
         'price_per_block',
-        'available_blocks',
+        'max_available_blocks',
+        'remaining_blocks',
         'total_investment',
         'max_earning',
         'investment_roi',
-        'is_sold'
     ];
 
     protected $casts = [

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Auth\AuthenticationException;
 use App\Http\Middleware\Creator;
+use App\Http\Middleware\Consumer;
 
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'creator' => Creator::class,
+            'consumer' => Consumer::class,
         ]);
         
     })

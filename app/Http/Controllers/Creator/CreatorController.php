@@ -3,19 +3,233 @@
 namespace App\Http\Controllers\Creator;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MediaResource;
 use App\Models\MarketplaceAsset;
 use App\Models\SongGeneration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Services\SunoApiService;
+use Illuminate\Support\Facades\Http;
 
 class CreatorController extends Controller
 {
-    public function generateSong(Request $request)
+    protected $sunoService;
+
+    public function __construct(SunoApiService $sunoService)
+    {
+        $this->sunoService = $sunoService;
+    }
+
+    public function generateSongUsingAI(Request $request)
     {
 
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'prompt' => 'required|string',
+            'genre' => 'required|string|max:100',
+            'instrumentation' => 'required|string|max:100',
+            'tempo' => 'required|numeric|min:20|max:200',
+            'gender' => 'nullable|string|in:m,f',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()->all()
+            ], 422);
+        }
+
+        try {
+            $prompt = $request->input('prompt') . ' Instrumentation: ' . $request->input('instrumentation') . ' Tempo: ' . $request->input('tempo') . ' BPM';
+            // Simulate song generation process
+            $generationResult = $this->sunoService->generateMusic(
+                $prompt,
+                $request->input('genre'),
+                $request->input('title'),
+                null,
+                $request->input('gender') ?? 'm'
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Song generation initiated successfully.',
+                'data' => $generationResult
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Song generation failed.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
     }
+
+    public function getGenerationStatus($generationId)
+    {
+
+        try {
+            $status = $this->sunoService->getGenerationStatus($generationId);
+
+            // Safely get sunoData array
+            $sunoData = data_get($status, 'data.response.sunoData', []);
+
+            // Extract only required fields
+            $audioData = collect($sunoData)->map(function ($item) {
+                return [
+                    'audioUrl' => $item['audioUrl'] ?? null,
+                    'sourceAudioUrl' => $item['sourceAudioUrl'] ?? null,
+                    'streamAudioUrl' => $item['streamAudioUrl'] ?? null,
+                    'sourceStreamAudioUrl' => $item['sourceStreamAudioUrl'] ?? null,
+                ];
+            })->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => $audioData,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function uploadSong(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'audio' => 'required',
+            'cover_image' => 'required|file|mimes:jpg,jpeg,png,webp',
+            'title' => 'required|string|max:255',
+            'overview' => 'required|string',
+            'prompt' => 'required|string',
+            'genre' => 'required|string|max:100',
+            'instrumentation' => 'required|string|max:100',
+            'tempo' => 'required|numeric|min:20|max:200',
+            'agreement_type' => 'required|string|max:255',
+            'agreement' => 'required|string',
+            'taskId' => 'required|string',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validated->errors()->all()
+            ], 422);
+        }
+
+        $tempAudioPath = null;
+
+        try {
+            DB::beginTransaction();
+
+            /** ---------------- AUDIO HANDLING ---------------- */
+            if ($request->hasFile('audio')) {
+                // Normal file upload
+                $audioFile = $request->file('audio');
+            } else {
+                // Audio is URL
+                if (!filter_var($request->audio, FILTER_VALIDATE_URL)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid audio URL'
+                    ], 422);
+                }
+
+                $audioResponse = Http::get($request->audio);
+
+                if (!$audioResponse->successful()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unable to download audio file'
+                    ], 422);
+                }
+
+                // Create temp file
+                $tempAudioPath = tempnam(sys_get_temp_dir(), 'audio_');
+                file_put_contents($tempAudioPath, $audioResponse->body());
+
+                $audioFile = new \Illuminate\Http\UploadedFile(
+                    $tempAudioPath,
+                    basename(parse_url($request->audio, PHP_URL_PATH)),
+                    $audioResponse->header('Content-Type'),
+                    null,
+                    true
+                );
+            }
+
+            $coverFile = $request->file('cover_image');
+
+            /** ---------------- FILE PATHS ---------------- */
+            $userFolder = 'creator/' . $request->user()->id;
+            $audioFilename = time() . '_' . $audioFile->getClientOriginalName();
+            $coverFilename = time() . '_' . $coverFile->getClientOriginalName();
+
+            $audioPath = $userFolder . '/audio/' . $audioFilename;
+            $coverPath = $userFolder . '/covers/' . $coverFilename;
+
+            /** ---------------- DB INSERT ---------------- */
+            $song = SongGeneration::create([
+                'user_id' => $request->user()->id,
+                'title' => $request->title,
+                'overview' => $request->overview,
+                'description' => $request->prompt,
+                'genre' => $request->genre,
+                'instrumental_type' => $request->instrumentation,
+                'tempo' => $request->tempo,
+                'agreement_type' => $request->agreement_type,
+                'agreements' => $request->agreement,
+                'file' => $audioPath,
+                'cover_image' => $coverPath,
+                'file_type' => 'audio',
+                'status' => 'uploaded',
+                'taskId' => $request->taskId,
+            ]);
+
+            /** ---------------- STORAGE ---------------- */
+            Storage::disk('public')->putFileAs(
+                $userFolder . '/audio',
+                $audioFile,
+                $audioFilename
+            );
+
+            Storage::disk('public')->putFileAs(
+                $userFolder . '/covers',
+                $coverFile,
+                $coverFilename
+            );
+
+            DB::commit();
+
+            /** ---------------- CLEAN TEMP FILE ---------------- */
+            if ($tempAudioPath && file_exists($tempAudioPath)) {
+                unlink($tempAudioPath);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Song uploaded successfully.',
+                'media_id' => $song->id,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Clean temp file on failure
+            if ($tempAudioPath && file_exists($tempAudioPath)) {
+                unlink($tempAudioPath);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Song upload failed.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function uploadVideo(Request $request)
     {
         $validated = Validator::make($request->all(), [
@@ -77,6 +291,7 @@ class CreatorController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Video uploaded successfully.',
+                'media_id' => $song->id,
             ]);
 
         } catch (\Exception $e) {
@@ -154,6 +369,7 @@ class CreatorController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Illustration uploaded successfully.',
+                'media_id' => $song->id,
             ]);
 
         } catch (\Exception $e) {
@@ -179,6 +395,7 @@ class CreatorController extends Controller
             'tags' => 'required|array',
             'tags.*' => 'string|max:255',
             'asset_type' => 'required|in:video,audio,illustration',
+            'preview_duration' => 'nullable|string|in:30,60,90,120,full',
         ]);
 
         if ($validator->fails()) {
@@ -208,6 +425,7 @@ class CreatorController extends Controller
                 'price' => $request->price,
                 'sale_type' => 'sale',
                 'tags' => $request->filled('tags') ? $request->tags : null,
+                'preview_duration' => $request->preview_duration,
             ];
 
             // Handle thumbnail upload
@@ -303,7 +521,8 @@ class CreatorController extends Controller
                 'total_valuation' => $request->total_valuation,
                 'ownership_block' => $request->ownership_block,
                 'price_per_block' => $request->price_per_block,
-                'available_blocks' => $request->available_blocks,
+                'max_available_blocks' => $request->available_blocks,
+                'remaining_blocks' => $request->available_blocks,
             ];
 
             // Handle thumbnail upload
@@ -433,6 +652,56 @@ class CreatorController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function myTracks(Request $request){
+        $user = $request->user();
+
+        try{
+            $tracks = SongGeneration::with('marketplaceAssets')->where('user_id', $user->id)
+            ->where('file_type', 'audio')
+            ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => MediaResource::collection($tracks),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch tracks.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+
+    public function myTrackDetails(Request $request, $id){
+        $user = $request->user();
+
+        try{
+            $track = SongGeneration::with('marketplaceAssets')->where('user_id', $user->id)
+            ->where('file_type', 'audio')
+            ->where('id', $id)
+            ->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => new MediaResource($track),
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Track not found.'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch track details.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
     }
 
 

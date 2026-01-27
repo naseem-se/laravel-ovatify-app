@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('file_type')->nullable();
             $table->string('file')->nullable();
+            $table->string('taskId')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

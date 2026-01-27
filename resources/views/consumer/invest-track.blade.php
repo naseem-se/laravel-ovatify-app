@@ -1,148 +1,110 @@
 @extends('layouts.app')
 
-
 @section('content')
-    {{-- Header --}}
-    <div class="card border border-gray-700 rounded-lg p-6">
-        <div class="card-header flex justify-between items-center mb-8">
-            <p class="text-accent text-xl font-medium">
-                <a href="{{ route('consumer.dashboard.index') }}"><i class="fa-solid fa-arrow-left"></i></a>
-                Invest In Track
-            </p>
+
+    {{-- Header with Track Summary --}}
+    <div class="bg-[#252525] rounded-3xl p-8 mb-8 flex items-center gap-8 border border-gray-800 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+
+        <div class="w-24 h-24 rounded-2xl overflow-hidden shadow-xl relative z-10">
+            <img src="https://picsum.photos/200/200?random=15" class="w-full h-full object-cover">
         </div>
 
-        <div class="card-body space-y-6">
-
-            <!-- Product Card -->
-            <div class="border border-purple-500 rounded-lg p-4 mb-8 hover:border-purple-400 transition">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                            <span class="text-lg">🎵</span>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-white">Night Vibes</h3>
-                            <p class="text-sm text-gray-400">By Alex M.</p>
-                        </div>
-                    </div>
-                    <span class="text-xl font-semibold text-white">$29.00</span>
+        <div class="relative z-10 flex-1">
+            <h2 class="text-2xl font-black mb-1">Invest in "Summer Melodies"</h2>
+            <p class="text-sm text-gray-500 mb-4 flex items-center gap-3">
+                <img src="https://i.pravatar.cc/24?img=12" class="w-5 h-5 rounded-full">
+                Luna Beats · Pop · 120 BPM
+            </p>
+            <div class="flex gap-10">
+                <div>
+                    <span class="text-[10px] text-gray-500 uppercase block mb-1">Price per share</span>
+                    <span class="text-xl font-bold text-accent">$5.00</span>
                 </div>
-            </div>
-
-            <!-- Subtotal -->
-            <div class="flex justify-between mb-8 pb-4 border-b border-gray-700">
-                <span class="text-gray-400">Subtotal</span>
-                <span class="text-white font-semibold">$29.00</span>
-            </div>
-
-            <!-- Form Fields -->
-            <form class="space-y-4 mb-8">
-                <!-- Name -->
-                <input type="text" placeholder="Name"
-                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
-
-                <!-- Credit Card -->
-                <input type="text" placeholder="Credit Card No"
-                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
-
-                <!-- Expiry and CVV -->
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="Expiry"
-                        class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
-                    <input type="text" placeholder="CVV"
-                        class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                <div>
+                    <span class="text-[10px] text-gray-500 uppercase block mb-1">Available Shares</span>
+                    <span class="text-xl font-bold text-white">75 <span class="text-xs text-gray-500">/ 100</span></span>
                 </div>
-
-                <!-- Checkbox -->
-                <label class="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" checked
-                        class="w-5 h-5 bg-blue-600 border border-blue-600 rounded cursor-pointer accent-blue-600">
-                    <span class="text-gray-300 text-sm">Save card for future purchases</span>
-                </label>
-            </form>
-
-            <!-- Buttons -->
-            <div class="space-y-3">
-                <button onclick="showSuccessModal()"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
-                    Confirm & Pay
-                </button>
-                <button
-                    class="w-full border border-gray-600 hover:border-gray-400 text-white font-semibold py-3 rounded-lg transition">
-                    Back to track
-                </button>
+                <div>
+                    <span class="text-[10px] text-gray-500 uppercase block mb-1">Projected ROI</span>
+                    <span class="text-xl font-bold text-green-400">12.5%</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Success Modal -->
-    {{-- <div id="successModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"></div> --}}
-    <div id="successModal" class="hidden bg-black/70 fixed inset-0 bg-opacity-90 flex items-center justify-center p-4 z-50">
-        <div class="rounded-lg max-w-md w-full p-8 text-center" style="background-color: #252525">
-            <!-- Animated Circle with Checkmark -->
-            <div class="mb-8 flex justify-center">
-                <div class="relative w-32 h-32">
-                    <!-- Main Circle -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-pink-500 to-magenta-600 rounded-full flex items-center justify-center animate-pulse"
-                        style="background: linear-gradient(135deg, rgb(236, 72, 153) 0%, rgb(236, 72, 153) 100%);">
-                        <!-- Checkmark -->
-                        <div class="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
-                            <svg class="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7">
-                                </path>
-                            </svg>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-12 gap-8">
+        {{-- Left: Selection --}}
+        <div class="col-span-8">
+            <h3 class="text-lg font-bold mb-6">Select Investment Blocks</h3>
 
-                    <!-- Floating Dots -->
-                    <div class="absolute w-4 h-4 bg-pink-500 rounded-full top-0 left-8 animate-bounce"></div>
-                    <div class="absolute w-3 h-3 bg-pink-400 rounded-full top-2 right-6 animate-bounce"
-                        style="animation-delay: 0.2s;"></div>
-                    <div class="absolute w-3 h-3 bg-pink-500 rounded-full bottom-8 left-2 animate-bounce"
-                        style="animation-delay: 0.4s;"></div>
-                    <div class="absolute w-2 h-2 bg-pink-400 rounded-full bottom-4 right-4 animate-bounce"
-                        style="animation-delay: 0.6s;"></div>
-                    <div class="absolute w-2 h-2 bg-pink-500 rounded-full top-16 right-0 animate-bounce"
-                        style="animation-delay: 0.3s;"></div>
-                </div>
+            {{-- Blocks Grid --}}
+            <div class="grid grid-cols-10 gap-2 mb-10">
+                @for($i = 1; $i <= 100; $i++)
+                    @php $isAvailable = $i > 25; @endphp
+                    <button
+                        class="aspect-square rounded-md flex items-center justify-center text-[8px] font-bold transition
+                            {{ $isAvailable ? 'bg-gray-800 border border-gray-700 text-gray-500 hover:border-accent hover:text-white' : 'bg-accent/20 border border-accent/40 text-accent cursor-not-allowed opacity-40' }}"
+                        {{ !$isAvailable ? 'disabled' : '' }}>
+                        {{ $i }}
+                    </button>
+                @endfor
             </div>
 
-            <!-- Text Content -->
-            <h2 class="text-3xl font-bold mb-3 text-white">Payment Successful</h2>
-            <p class="text-gray-400 mb-8">Your Track is now available in your library</p>
+            {{-- Accordion Sections --}}
+            <div class="space-y-4">
+                <div class="p-6 rounded-2xl bg-[#252525] border border-gray-700">
+                    <button class="w-full flex justify-between items-center text-left">
+                        <span class="font-bold">Smart Contract Details</span>
+                        <i class="fas fa-chevron-down text-gray-500"></i>
+                    </button>
+                    <div class="mt-4 text-xs text-gray-400 leading-relaxed pr-10">
+                        Your investment is secured via a decentralized smart contract on the blockchain. Revenue
+                        distribution is automated and transparent.
+                    </div>
+                </div>
 
-            <!-- Buttons -->
-            <div class="space-y-3">
-                <button onclick="closeSuccessModal()"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
-                    Go to My Track
-                </button>
-                <button onclick="closeSuccessModal()"
-                    class="w-full border border-gray-600 hover:border-gray-400 text-white font-semibold py-3 rounded-lg transition">
-                    Explore more music
-                </button>
+                <div class="p-6 rounded-2xl bg-[#252525] border border-gray-700 opacity-60">
+                    <button class="w-full flex justify-between items-center text-left">
+                        <span class="font-bold">Historical Performance</span>
+                        <i class="fas fa-chevron-right text-gray-500 text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Right: Checkout --}}
+        <div class="col-span-4">
+            <div class="bg-[#252525] border border-accent/30 rounded-3xl p-8 shadow-2xl sticky top-8">
+                <h3 class="text-lg font-bold mb-8">Investment Summary</h3>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Selected Blocks</span>
+                        <span class="text-sm font-bold">10</span>
+                    </div>
+                    <div class="flex justify-between items-center text-accent">
+                        <span class="text-sm">Total Ownership</span>
+                        <span class="text-sm font-bold">1.0%</span>
+                    </div>
+                    <div class="border-t border-gray-700 pt-4 flex justify-between items-center">
+                        <span class="text-lg font-bold">Total Amount</span>
+                        <span class="text-2xl font-black text-white">$50.00</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <button
+                        class="w-full py-5 rounded-2xl bg-accent text-white font-bold text-md hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] transition">
+                        Invest Now
+                    </button>
+                    <p class="text-[10px] text-center text-gray-500 px-4">
+                        By clicking "Invest Now", you confirm you have read and approved the <a href="#"
+                            class="text-accent underline">Investment Agreement</a>.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
 @endsection
-
-@push('scripts')
-    <script>
-        function showSuccessModal() {
-            document.getElementById('successModal').classList.remove('hidden');
-        }
-
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('successModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeSuccessModal();
-            }
-        });
-    </script>
-@endpush

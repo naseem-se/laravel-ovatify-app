@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'suno' => [
+        'api_key' => env('SUNO_API_KEY'),
+        'api_url' => env('SUNO_API_URL', 'https://api.sunoapi.org'),
+    ],
+
 ];

@@ -2,42 +2,62 @@
 
 @section('content')
 
-{{-- Header --}}
-<div class="flex justify-between items-center mb-8">
-    <div>
-        <h2 class="text-accent text-2xl font-semibold">Hey!</h2>
-        <h1 class="text-3xl font-bold">Your Tracks</h1>
-    </div>
-</div>
-
-
-{{-- Filters --}}
-<div class="flex gap-3 mb-8">
-    @foreach(['Beats','Vocals','Loops','Bundles','Bundles','Bundles','Bundles'] as $item)
-        <button class="px-4 py-1 rounded-full border border-accent text-accent text-xs hover:bg-accent hover:text-white transition">
-            {{ $item }}
-        </button>
-    @endforeach
-</div>
-
-<div class="grid grid-cols-3 gap-6 mb-10">
-    @for($i=0;$i<4;$i++)
-        <div class="bg-card rounded-xl p-4">
-            <div class="h-36 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 mb-4"></div>
-            <div class="flex justify-between items-center">
-                <div class="flex">
-                    <img src="https://i.pravatar.cc/300" alt="Creator Avatar" class="w-6 h-6 rounded-full mr-2">
-                    <span class="text-xs text-gray-400 self-center">Casendra Cobrera</span>
-                </div>
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 7L12 14M12 14L15 11M12 14L9 11" stroke="#FF00FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M16 17H12H8" stroke="#FF00FF" stroke-width="1.5" stroke-linecap="round"></path> <path opacity="0.5" d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="#FF00FF" stroke-width="1.5"></path> </g></svg>
-            </div>
-            <h4 class="font-medium mt-2">Family memeries</h4>
-            <p class="text-xs text-gray-400 mt-2">Expires on Dec 15 26026</p>
-            <p class="text-xs text-gray-400 mb-2">invested: $5000</p>
-            <badge class=" bg-green-700 text-white text-xs font-semibold py-1.5 px-2.5 rounded-full">Licensed</badge>
+    {{-- Header --}}
+    <div class="flex justify-between items-center mb-16">
+        <div>
+            <h2 class="text-accent text-sm font-bold uppercase tracking-widest mb-2">My Library</h2>
+            <h1 class="text-5xl font-black">Your Tracks</h1>
         </div>
-    @endfor
-</div>
+    </div>
 
+    {{-- Tabs --}}
+    <div class="flex gap-8 mb-8 border-b border-gray-700">
+        <button class="pb-3 text-sm font-medium border-b-2 border-accent text-accent">
+            My Published Tracks
+        </button>
+        <button class="pb-3 text-sm font-medium text-gray-400 hover:text-white">
+            My Creations with AI
+        </button>
+    </div>
+
+    {{-- Tracks List --}}
+    <div class="space-y-4 mb-8">
+        @for($i = 0; $i < 3; $i++)
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-[#252525]">
+                {{-- Track Image --}}
+                <div class="w-20 h-20 rounded-lg flex-shrink-0 relative"
+                    style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.3) 0%, rgba(75, 0, 130, 0.4) 50%, rgba(25, 25, 112, 0.3) 100%);">
+                    {{-- Play Button --}}
+                    <button
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-black/50">
+                        <svg class="w-3 h-3 text-accent ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Track Info --}}
+                <div class="flex-1">
+                    <h4 class="font-medium text-sm">Family memories</h4>
+                    <p class="text-xs text-gray-500">Pop R&B | Warm happy</p>
+                    <span class="inline-block mt-2 text-xs bg-accent/20 text-accent px-2 py-0.5 rounded">
+                        Draft
+                    </span>
+                </div>
+
+                {{-- Waveform --}}
+                <div class="flex-1 flex items-center justify-center gap-0.5 h-8">
+                    @foreach([20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30, 42, 25, 35, 28, 40, 22, 34, 38, 20, 35, 25, 45, 20, 32, 40, 28, 38] as $h)
+                        <div class="w-1 rounded-full bg-gray-600" style="height: {{ $h }}px;"></div>
+                    @endforeach
+                </div>
+            </div>
+        @endfor
+    </div>
+
+    {{-- List on Marketplace Button --}}
+    <button class="w-full py-4 rounded-lg bg-[#252525] text-white text-sm font-medium hover:bg-[#303030] transition">
+        List your track on QmeMarketplace
+    </button>
 
 @endsection

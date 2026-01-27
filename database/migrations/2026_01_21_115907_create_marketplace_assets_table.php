@@ -28,7 +28,6 @@ return new class extends Migration {
             $table->enum('sale_type', ['sale', 'investment', 'license']);
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('is_active')->default(true);
-            $table->boolean('is_sold')->default(false);
             $table->integer('preview_duration')->nullable();
 
             // License & investment
@@ -40,7 +39,8 @@ return new class extends Migration {
             $table->integer('total_valuation')->nullable();
             $table->integer('ownership_block')->nullable();
             $table->integer('price_per_block')->nullable();
-            $table->integer('available_blocks')->nullable();
+            $table->integer('max_available_blocks')->nullable();
+            $table->integer('remaining_blocks')->nullable();
             $table->decimal('total_investment', 10, 2)->nullable();
             $table->decimal('max_earning', 10, 2)->nullable();
             $table->decimal('investment_roi', 5, 2)->nullable(); 
