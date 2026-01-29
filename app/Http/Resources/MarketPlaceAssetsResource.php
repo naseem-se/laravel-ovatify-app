@@ -31,9 +31,12 @@ class MarketplaceAssetsResource extends JsonResource
             'price_per_license' => (float) $this->price_per_license,
             'license_duration' => $this->license_duration,
 
+            'total_valuation' => (int) $this->total_valuation,
+            'ownership_blocks' => (int) $this->ownership_blocks,
             'price_per_block' => (int) $this->price_per_block,
             'max_available_blocks' => (int) $this->max_available_blocks,
             'remaining_blocks' => (int) $this->remaining_blocks,
+            'total_investments' => (float) $this->total_investments,
 
             // 🔹 Song Generation
             'song_generation' => $this->whenLoaded('songGeneration', function () {

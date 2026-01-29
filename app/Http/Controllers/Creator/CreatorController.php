@@ -22,6 +22,47 @@ class CreatorController extends Controller
         $this->sunoService = $sunoService;
     }
 
+    public function dashboard(Request $request)
+    {
+        $user = $request->user();
+
+        try {
+            $totalTracks = SongGeneration::where('user_id', $user->id)
+                ->where('file_type', 'audio')
+                ->count();
+
+            $totalVideos = SongGeneration::where('user_id', $user->id)
+                ->where('file_type', 'video')
+                ->count();
+
+            $totalIllustrations = SongGeneration::where('user_id', $user->id)
+                ->where('file_type', 'illustration')
+                ->count();
+
+            $newReleases = MarketplaceAsset::where('asset_type', 'audio')
+                ->where('created_at', '>=', now()->subMonth())
+                ->limit(5)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total_tracks' => $totalTracks,
+                    'total_videos' => $totalVideos,
+                    'total_illustrations' => $totalIllustrations,
+                    'new_releases' => MediaResource::collection($newReleases),
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch dashboard data.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function generateSongUsingAI(Request $request)
     {
 

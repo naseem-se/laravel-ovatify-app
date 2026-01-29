@@ -453,6 +453,27 @@ class PurchaseController extends Controller
             ], 404);
         }
     }
+    public function assetDetails(int $id): JsonResponse
+    {
+        try {
+            $asset = MarketplaceAsset::query()
+                ->with('user', 'songGeneration')
+                ->where('is_active', true)
+                ->findOrFail($id);
+
+
+            return response()->json([
+                'success' => true,
+                'track' => MarketplaceAssetsResource::collection([$asset]),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Asset not found. Invalid ID provided.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 404);
+        }
+    }
 
 
 

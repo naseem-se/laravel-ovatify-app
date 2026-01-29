@@ -27,6 +27,7 @@ Route::prefix('auth')->group(function () {
 Route::middleware(['auth:sanctum', 'creator'])->group(function () {
 
     Route::prefix('creator')->group(function () {
+        Route::get('dashboard', [CreatorController::class, 'dashboard']);
         Route::post('generate/song/usingai', [CreatorController::class, 'generateSongUsingAI']);
         Route::post('get/song/generation/status/{id}', [CreatorController::class, 'getGenerationStatus']);
         Route::post('upload/song', [CreatorController::class, 'uploadSong']);
@@ -66,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('list/tracks', [PurchaseController::class, 'listTracks']);
         Route::get('track/details/{id}', [PurchaseController::class, 'trackDetails']);
+        Route::get('asset/details/{id}', [PurchaseController::class, 'assetDetails']);
         // Purchase endpoints
         Route::post('/purchases/asset', [PurchaseController::class, 'purchaseAsset'])->name('purchase.asset');
 
