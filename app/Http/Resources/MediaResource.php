@@ -28,9 +28,28 @@ class MediaResource extends JsonResource
             'agreement' => $this->agreements,
             'file' =>  $this->file ? url(Storage::url($this->file)) : null,
             'status' => $this->status,
-            'enabled_for_sale' => $this->marketplaceAssets->where('sale_type', 'sale')->isEmpty(),
-            'enabled_for_investment' => $this->marketplaceAssets->where('sale_type', 'investment')->isEmpty(),
-            'enabled_for_license' => $this->marketplaceAssets->where('sale_type', 'license')->isEmpty(),
+            'enabled_for_sale' => $this->marketplaceAssets->where('sale_type', 'sale')->isNotEmpty(),
+            'enabled_for_investment' => $this->marketplaceAssets->where('sale_type', 'investment')->isNotEmpty(),
+            'enabled_for_license' => $this->marketplaceAssets->where('sale_type', 'license')->isNotEmpty(),
+
+            'creator' => $this->whenLoaded('user', function () {
+                return [
+                    'id' => $this->user->id,
+                    'username' => $this->user->username,
+                    'email' => $this->user->email,
+                    'role' => $this->user->role,
+                    'profile_image' => $this->user->profile_image
+                        ? url(Storage::url($this->user->profile_image))
+                        : null,
+                ];
+            }),
+
+
+            'marketplace_assets' => $this->whenLoaded('marketplaceAssets', function () {
+                return MarketplaceAssetsResource::collection($this->marketplaceAssets);
+            }),
+
+
         ];
     }
 }

@@ -39,5 +39,14 @@ return [
         'api_key' => env('SUNO_API_KEY'),
         'api_url' => env('SUNO_API_URL', 'https://api.sunoapi.org'),
     ],
+    'stripe' => [
+        'public' => env('STRIPE_PUBLIC_KEY'),
+        'secret' => env('STRIPE_SECRET_KEY'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'platform' => [
+        'fee' => env('PLATFORM_FEE_PERCENTAGE', 10),
+    ],
 
 ];

@@ -49,7 +49,17 @@ class SongGeneration extends Model
      */
     public function marketplaceAssets()
     {
-        return $this->hasMany(MarketplaceAsset::class); 
+        return $this->hasMany(MarketplaceAsset::class, 'song_generation_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasManyThrough(
+            MarketplaceTransaction::class,
+            MarketplaceAsset::class,
+            'song_generation_id',
+            'marketplace_asset_id'
+        );
     }
 
 }

@@ -35,7 +35,6 @@ class MarketplaceAssetsResource extends JsonResource
             'max_available_blocks' => (int) $this->max_available_blocks,
             'remaining_blocks' => (int) $this->remaining_blocks,
 
-
             // 🔹 Song Generation
             'song_generation' => $this->whenLoaded('songGeneration', function () {
                 return [
@@ -65,6 +64,9 @@ class MarketplaceAssetsResource extends JsonResource
                     'username' => $this->user->username,
                     'email' => $this->user->email,
                     'role' => $this->user->role,
+                    'profile_image' => $this->user->profile_image
+                        ? url(Storage::url($this->user->profile_image))
+                        : null,
                 ];
             }),
         ];

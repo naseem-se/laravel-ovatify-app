@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'username','phone','email','password','role','locale','two_factor_method','is_active','is_google','is_apple'
+        'username','phone','email','password','role','locale','two_factor_method','is_active','is_google','is_apple','profile_image'
     ];
 
     /**
@@ -69,6 +69,11 @@ class User extends Authenticatable
     public function marketplaceAssets()
     {
         return $this->hasMany(MarketplaceAsset::class);
+    }
+
+    public function sellerBankAccounts()
+    {
+        return $this->hasMany(SellerBankAccount::class);
     }
 
 
