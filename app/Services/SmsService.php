@@ -9,7 +9,7 @@ class SmsService
     {
         // implement using provider API (Twilio/Nexmo etc)
         // return true on success, false on fail or throw exception
-        Log::info("SMS to {$phone}: {$message}");
+        Log::info("Verification SMS sent to {$phone}: {$message}");
         return true;
     }
 }
