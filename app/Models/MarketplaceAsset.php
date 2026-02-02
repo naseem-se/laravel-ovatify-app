@@ -56,7 +56,7 @@ class MarketplaceAsset extends Model
 
     public function songGeneration(): BelongsTo
     {
-        return $this->belongsTo(SongGeneration::class);
+        return $this->belongsTo(SongGeneration::class, 'song_generation_id');
     }
 
     public function purchases(): HasMany
@@ -144,5 +144,18 @@ class MarketplaceAsset extends Model
     public function getRemainingBlocks(): int
     {
         return max(0, $this->remaining_blocks ?? 0);
+    }
+
+    // THROUGH RELATIONSHIPS
+    public function transactionsWithUsers()
+    {
+        return $this->hasManyThrough(
+            User::class,
+            MarketplaceTransaction::class,
+            'marketplace_asset_id',
+            'id',
+            'id',
+            'user_id'
+        );
     }
 }

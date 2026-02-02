@@ -57,6 +57,10 @@ Route::middleware(['auth:sanctum', 'consumer'])->group(function () {
     Route::prefix('consumer')->group(function () {
         Route::get('dashboard', [ConsumerController::class, 'dashboard']);
         Route::get('view/track/details/{id}', [ConsumerController::class, 'trackDetails']);
+
+        Route::get('my/purchases', [ConsumerController::class, 'myPurchases']);
+        Route::get('my/purchase/details/{id}', [ConsumerController::class, 'myPurchaseDetails']);
+        Route::post('download/purchased/asset/{id}', [ConsumerController::class, 'downloadPurchasedAsset']);
     });
 });
 

@@ -54,6 +54,22 @@ class MarketplaceTransaction extends Model
         return $this->belongsTo(MarketplaceAsset::class, 'marketplace_asset_id');
     }
 
+    public function purchase(): BelongsTo
+    {
+        return $this->belongsTo(MarketplacePurchase::class, 'transaction_id');
+    }
+
+    public function license(): BelongsTo
+    {
+        return $this->belongsTo(MarketplaceLicense::class, 'transaction_id');
+    }
+
+    public function investment(): BelongsTo
+    {
+        return $this->belongsTo(MarketplaceInvestment::class, 'transaction_id');
+    }
+
+
     // Scopes
     public function scopeCompleted(Builder $query): Builder
     {

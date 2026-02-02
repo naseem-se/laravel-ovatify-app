@@ -76,5 +76,41 @@ class User extends Authenticatable
         return $this->hasMany(SellerBankAccount::class);
     }
 
+    public function buyerTransactions()
+    {
+        return $this->hasMany(MarketplaceTransaction::class, 'user_id', 'id');
+    }
+
+    public function sellerTransactions()
+    {
+        return $this->hasMany(MarketplaceTransaction::class, 'seller_id', 'id');
+    }
+
+    public function marketplacePurchases()
+    {
+        return $this->hasMany(MarketplacePurchase::class);
+    }
+
+    public function marketplaceLicenses()
+    {
+        return $this->hasMany(MarketplaceLicense::class);
+    }
+
+    public function marketplaceInvestments()
+    {
+        return $this->hasMany(MarketplaceInvestment::class);
+    }
+
+    // THROUGH RELATIONSHIPS
+    public function assetsViaSongs()
+    {
+        return $this->hasManyThrough(
+            MarketplaceAsset::class,
+            SongGeneration::class,
+            'user_id',
+            'song_generation_id'
+        );
+    }
+
 
 }

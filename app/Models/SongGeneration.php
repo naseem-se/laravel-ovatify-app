@@ -62,4 +62,34 @@ class SongGeneration extends Model
         );
     }
 
+    public function purchases()
+    {
+        return $this->hasManyThrough(
+            MarketplacePurchase::class,
+            MarketplaceAsset::class,
+            'song_generation_id',
+            'marketplace_asset_id'
+        );
+    }
+
+    public function licenses()
+    {
+        return $this->hasManyThrough(
+            MarketplaceLicense::class,
+            MarketplaceAsset::class,
+            'song_generation_id',
+            'marketplace_asset_id'
+        );
+    }
+
+    public function investments()
+    {
+        return $this->hasManyThrough(
+            MarketplaceInvestment::class,
+            MarketplaceAsset::class,
+            'song_generation_id',
+            'marketplace_asset_id'
+        );
+    }
+
 }

@@ -314,7 +314,8 @@ class PurchaseService
                 'ownership_percentage' => $ownershipPercentage,
                 'payment_status' => 'completed',
                 'payment_method' => $paymentData['method'] ?? 'card',
-                'expected_roi' => $this->calculateExpectedROI((float) $amount, $asset->investment_roi ?? 0),
+                // 'expected_roi' => $this->calculateExpectedROI((float) $amount, $asset->investment_roi ?? 0),
+                'expected_roi' =>  $amount,
                 'is_active' => true,
             ]);
 
