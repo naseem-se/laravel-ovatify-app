@@ -375,61 +375,92 @@ class PurchaseController extends Controller
 
     public function listTracks(Request $request): JsonResponse
     {
-        $featuredDrops = SongGeneration::query()
-            ->with('user', 'marketplaceAssets')
-            ->where('status', 'uploaded')
-            ->where('file_type', 'audio')
-            ->withCount([
-                'marketplaceAssets as assets_count' => function ($query) {
-                    $query->where('is_active', true);
-                }
-            ])
-            ->withCount([
-                'transactions as transactions_count' => function ($query) {
-                    $query->where('status', 'completed');
-                }
-            ])
-            ->orderByDesc('created_at')
-            ->orderByDesc('transactions_count')
-            ->limit(5)
-            ->get();
+        try {
+            // Featured drops
+            $featuredDrops = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', 'audio')
+                ->withCount([
+                    'marketplaceAssets as assets_count' => function ($query) {
+                        $query->where('is_active', true);
+                    }
+                ])
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get()
+                ->filter(function ($song) {
+                    return $song->assets_count > 0;
+                })
+                ->values();
 
-        $fourteenDaysAgo = now()->subDays(14);
+            $fourteenDaysAgo = now()->subDays(14);
 
-        $trendingSongs = SongGeneration::query()
-            ->with('user', 'marketplaceAssets')
-            ->where('status', 'uploaded')
-            ->where('file_type', 'audio')
-            ->withCount([
-                'transactions as transactions_count' => function ($query) use ($fourteenDaysAgo) {
-                    $query->where('status', 'completed')
-                        ->where('marketplace_transactions.created_at', '>=', $fourteenDaysAgo);
-                }
-            ])
-            ->withSum([
-                'transactions as total_revenue' => function ($query) use ($fourteenDaysAgo) {
-                    $query->where('status', 'completed')
-                        ->where('marketplace_transactions.created_at', '>=', $fourteenDaysAgo);
-                }
-            ], 'amount')
-            ->orderByDesc('transactions_count')
-            ->orderByDesc('total_revenue')
-            ->limit(5)
-            ->get();
+            // Trending songs (last 14 days)
+            $trendingSongs = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', 'audio')
+                ->get()
+                ->filter(function ($song) {
+                    return $song->marketplaceAssets->count() > 0;
+                })
+                ->map(function ($song) use ($fourteenDaysAgo) {
+                    $assetsIds = $song->marketplaceAssets->where('is_active', true)->pluck('id')->toArray();
 
-        // All Tracks from SongGeneration
-        $allTracks = SongGeneration::query()
-            ->with('user', 'marketplaceAssets')
-            ->where('status', 'uploaded')
-            ->where('file_type', 'audio')
-            ->paginate(1);
+                    $transactionsCount = 0;
+                    $totalRevenue = 0;
 
-        return response()->json([
-            'success' => true,
-            'featured_drops' => MediaResource::collection($featuredDrops),
-            'trending_assets' => MediaResource::collection($trendingSongs),
-            'all_tracks' => MediaResource::collection($allTracks),
-        ]);
+                    if (!empty($assetsIds)) {
+                        $transactionsCount = MarketplacePurchase::whereIn('marketplace_asset_id', $assetsIds)
+                            ->where('created_at', '>=', $fourteenDaysAgo)
+                            ->count();
+
+                        $totalRevenue = MarketplacePurchase::whereIn('marketplace_asset_id', $assetsIds)
+                            ->where('created_at', '>=', $fourteenDaysAgo)
+                            ->sum('purchase_price');
+                    }
+
+                    $song->transactions_count = $transactionsCount;
+                    $song->total_revenue = (float) ($totalRevenue ?? 0);
+
+                    return $song;
+                })
+                ->sortByDesc('transactions_count')
+                ->sortByDesc('total_revenue')
+                ->take(5)
+                ->values();
+
+            // All tracks
+            $allTracks = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', 'audio')
+                ->orderByDesc('created_at')
+                ->paginate(15);
+
+            return response()->json([
+                'success' => true,
+                'featured_drops' => MediaResource::collection($featuredDrops),
+                'trending_assets' => MediaResource::collection($trendingSongs),
+                'all_tracks' => [
+                    'data' => MediaResource::collection($allTracks->items()),
+                    'pagination' => [
+                        'total' => $allTracks->total(),
+                        'per_page' => $allTracks->perPage(),
+                        'current_page' => $allTracks->currentPage(),
+                        'last_page' => $allTracks->lastPage(),
+                    ],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching dashboard data.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+                
+            ]);
+        }
     }
 
     public function trackDetails(int $id): JsonResponse

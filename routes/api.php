@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Http\Controllers\Creator\CreatorController;
 use App\Http\Controllers\SellerBankAccountController;
 use App\Http\Controllers\Stripe\WebhookController;
+use App\Http\Controllers\Marketplace\InvestmentController;
 
 Route::prefix('auth')->group(function () {
     Route::post('signup', [AuthController::class, 'signup']);
@@ -23,6 +24,8 @@ Route::prefix('auth')->group(function () {
     Route::post('verify-reset-code', [VerificationController::class, 'verify']);
     Route::post('create-password', [PasswordController::class, 'createPassword']);
 });
+
+// creator routes
 
 Route::middleware(['auth:sanctum', 'creator'])->group(function () {
 
@@ -53,6 +56,9 @@ Route::middleware(['auth:sanctum', 'creator'])->group(function () {
 
 });
 
+
+// consumer routes
+
 Route::middleware(['auth:sanctum', 'consumer'])->group(function () {
     Route::prefix('consumer')->group(function () {
         Route::get('dashboard', [ConsumerController::class, 'dashboard']);
@@ -63,6 +69,9 @@ Route::middleware(['auth:sanctum', 'consumer'])->group(function () {
         Route::post('download/purchased/asset/{id}', [ConsumerController::class, 'downloadPurchasedAsset']);
     });
 });
+
+
+// common routes for authenticated users
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -98,6 +107,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['success' => true, 'user' => new UserResource($request->user())]);
     });
 
+    Route::get('/get/user/investments', [InvestmentController::class, 'getAllInvestments']);
+    Route::get('/get/user/investments/{investmentId}', [InvestmentController::class, 'getInvestmentDetails']);
+    Route::get('/get/user/investments/summary', [InvestmentController::class, 'getInvestmentSummary']);
+    Route::get('/get/user/investments/{investmentId}/history', [InvestmentController::class, 'getEarningHistory']);
+
     Route::post('/stripe/onboarding', [SellerBankAccountController::class, 'startOnboarding']);
 
     Route::get('/stripe/onboard/status', [SellerBankAccountController::class, 'getStatus']);
@@ -106,6 +120,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('auth/logout', [AuthController::class, 'logout']);
 });
+
 
 Route::get('/stripe/onboarding/refresh', [SellerBankAccountController::class, 'refreshOnboarding']);
 Route::get('/stripe/onboarding/complete', [SellerBankAccountController::class, 'completeOnboarding']);

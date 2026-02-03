@@ -11,6 +11,7 @@
 </head>
 
 <body class="bg-[#0f0f0f] min-h-screen flex flex-col gap-4 items-center justify-center text-white">
+    <h1>Testing auto deployment</h1>
 
     <button onclick="window.location.href='{{ route('login') }}'" class=" rounded-lg cursor-pointer hover:text-white">
         Go to Login Page
