@@ -138,7 +138,7 @@ class PurchaseController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'asset_id' => 'required|exists:marketplace_assets,id',
-                'blocks' => 'nullable|integer|min:1|default:5',
+                'blocks' => 'required|integer|min:1',
                 'payment_method' => 'required|in:card,paypal,wallet',
                 'payment_token' => 'required_if:payment_method,card',
             ]);
@@ -437,31 +437,123 @@ class PurchaseController extends Controller
                 ->where('status', 'uploaded')
                 ->where('file_type', 'audio')
                 ->orderByDesc('created_at')
-                ->paginate(15);
+                ->get();
 
             return response()->json([
                 'success' => true,
                 'featured_drops' => MediaResource::collection($featuredDrops),
                 'trending_assets' => MediaResource::collection($trendingSongs),
-                'all_tracks' => [
-                    'data' => MediaResource::collection($allTracks->items()),
-                    'pagination' => [
-                        'total' => $allTracks->total(),
-                        'per_page' => $allTracks->perPage(),
-                        'current_page' => $allTracks->currentPage(),
-                        'last_page' => $allTracks->lastPage(),
-                    ],
-                ],
+                'all_tracks' => MediaResource::collection($allTracks),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while fetching dashboard data.',
                 'error' => config('app.debug') ? $e->getMessage() : null,
-                
+
             ]);
         }
     }
+    public function listMedia(Request $request): JsonResponse
+    {
+        try {
+
+
+            $fourteenDaysAgo = now()->subDays(14);
+
+            // Trending songs (last 14 days)
+            $trendingSongs = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', '!=', 'audio')
+                ->get()
+                ->filter(function ($song) {
+                    return $song->marketplaceAssets->count() > 0;
+                })
+                ->map(function ($song) use ($fourteenDaysAgo) {
+                    $assetsIds = $song->marketplaceAssets->where('is_active', true)->pluck('id')->toArray();
+
+                    $transactionsCount = 0;
+                    $totalRevenue = 0;
+
+                    if (!empty($assetsIds)) {
+                        $transactionsCount = MarketplacePurchase::whereIn('marketplace_asset_id', $assetsIds)
+                            ->where('created_at', '>=', $fourteenDaysAgo)
+                            ->count();
+
+                        $totalRevenue = MarketplacePurchase::whereIn('marketplace_asset_id', $assetsIds)
+                            ->where('created_at', '>=', $fourteenDaysAgo)
+                            ->sum('purchase_price');
+                    }
+
+                    $song->transactions_count = $transactionsCount;
+                    $song->total_revenue = (float) ($totalRevenue ?? 0);
+
+                    return $song;
+                })
+                ->sortByDesc('transactions_count')
+                ->sortByDesc('total_revenue')
+                ->take(5)
+                ->values();
+
+            $recommendedForYou = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', '!=', 'audio')
+                ->whereHas('marketplaceAssets') // filter in DB
+                ->latest('created_at')
+                ->limit(5)
+                ->get();
+
+
+            $recentlyAdded = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', '!=', 'audio')
+                ->latest('created_at')
+                ->limit(10) // optional (recommended)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'trending_assets' => MediaResource::collection($trendingSongs),
+                'recommended_for_you' => MediaResource::collection($recommendedForYou),
+                'recently_added' => MediaResource::collection($recentlyAdded),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching dashboard data.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+
+            ]);
+        }
+    }
+
+    public function listMediaAll(Request $request): JsonResponse
+    {
+        try {
+            $allMedia = SongGeneration::query()
+                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+                ->where('status', 'uploaded')
+                ->where('file_type', '!=', 'audio')
+                ->orderByDesc('created_at')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'all_media' => MediaResource::collection($allMedia),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching media data.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ]);
+        }
+    }
+
+
 
     public function trackDetails(int $id): JsonResponse
     {

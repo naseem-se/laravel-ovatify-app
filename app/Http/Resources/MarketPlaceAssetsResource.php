@@ -39,30 +39,32 @@ class MarketplaceAssetsResource extends JsonResource
             'total_investments' => (float) $this->total_investments,
 
             // 🔹 Song Generation
-            'song_generation' => $this->whenLoaded('songGeneration', function () {
-                return [
+            'song_generation' => $this->whenLoaded(
+                'songGeneration',
+                fn() => $this->songGeneration ? [
                     'id' => $this->songGeneration->id,
                     'title' => $this->songGeneration->title,
                     'overview' => $this->songGeneration->overview,
                     'description' => $this->songGeneration->description,
+                    'agreement' => $this->songGeneration->agreements,
                     'genre' => $this->songGeneration->genre,
                     'tempo' => $this->songGeneration->tempo,
                     'instrumental_type' => $this->songGeneration->instrumental_type,
                     'status' => $this->songGeneration->status,
-
                     'cover_image' => $this->songGeneration->cover_image
                         ? url(Storage::url($this->songGeneration->cover_image))
                         : null,
-
                     'audio_file' => $this->songGeneration->file
                         ? url(Storage::url($this->songGeneration->file))
                         : null,
-                ];
-            }),
+                    
+                ] : null
+            ),
 
             // 🔹 User (Creator)
-            'creator' => $this->whenLoaded('user', function () {
-                return [
+            'creator' => $this->whenLoaded(
+                'user',
+                fn() => $this->user ? [
                     'id' => $this->user->id,
                     'username' => $this->user->username,
                     'email' => $this->user->email,
@@ -70,8 +72,9 @@ class MarketplaceAssetsResource extends JsonResource
                     'profile_image' => $this->user->profile_image
                         ? url(Storage::url($this->user->profile_image))
                         : null,
-                ];
-            }),
+                ] : null
+            ),
+
         ];
     }
 }

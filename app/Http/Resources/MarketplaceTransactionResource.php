@@ -20,7 +20,12 @@ class MarketplaceTransactionResource extends JsonResource
             'payment_method' => $this->payment_method,
             'completed_at' => $this->completed_at,
             'created_at' => $this->created_at,
-            'asset' => new MarketplaceAssetsResource($this->asset),
+            'asset' => $this->whenLoaded(
+                'asset',
+                fn() => $this->asset
+                ? new MarketplaceAssetsResource($this->asset)
+                : null
+            ),
             'seller' => [
                 'id' => $this->seller->id,
                 'username' => $this->seller->username,

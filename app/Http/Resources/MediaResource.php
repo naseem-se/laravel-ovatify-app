@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\MarketplaceAssetsResource;
 
 class MediaResource extends JsonResource
 {
@@ -26,14 +27,15 @@ class MediaResource extends JsonResource
             'mood' => $this->mood,
             'tempo' => $this->tempo,
             'agreement' => $this->agreements,
-            'file' =>  $this->file ? url(Storage::url($this->file)) : null,
+            'file' => $this->file ? url(Storage::url($this->file)) : null,
             'status' => $this->status,
             'enabled_for_sale' => $this->marketplaceAssets->where('sale_type', 'sale')->isNotEmpty(),
             'enabled_for_investment' => $this->marketplaceAssets->where('sale_type', 'investment')->isNotEmpty(),
             'enabled_for_license' => $this->marketplaceAssets->where('sale_type', 'license')->isNotEmpty(),
 
-            'creator' => $this->whenLoaded('user', function () {
-                return [
+            'creator' => $this->whenLoaded(
+                'user',
+                fn() => $this->user ? [
                     'id' => $this->user->id,
                     'username' => $this->user->username,
                     'email' => $this->user->email,
@@ -41,13 +43,16 @@ class MediaResource extends JsonResource
                     'profile_image' => $this->user->profile_image
                         ? url(Storage::url($this->user->profile_image))
                         : null,
-                ];
-            }),
+                ] : null
+            ),
 
 
-            'marketplace_assets' => $this->whenLoaded('marketplaceAssets', function () {
-                return MarketplaceAssetsResource::collection($this->marketplaceAssets);
-            }),
+            'marketplace_assets' => $this->whenLoaded(
+                'marketplaceAssets',
+                fn() => $this->marketplaceAssets->isNotEmpty()
+                ? MarketplaceAssetsResource::collection($this->marketplaceAssets)
+                : null
+            ),
 
 
         ];

@@ -63,6 +63,8 @@ Route::middleware(['auth:sanctum', 'consumer'])->group(function () {
     Route::prefix('consumer')->group(function () {
         Route::get('dashboard', [ConsumerController::class, 'dashboard']);
         Route::get('view/track/details/{id}', [ConsumerController::class, 'trackDetails']);
+        Route::get('view/track/agreement/{id}', [ConsumerController::class, 'trackAgreement']);
+        Route::get('search/track',[ConsumerController::class, 'searchTracks']);
 
         Route::get('my/purchases', [ConsumerController::class, 'myPurchases']);
         Route::get('my/purchase/details/{id}', [ConsumerController::class, 'myPurchaseDetails']);
@@ -79,6 +81,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('marketplace')->group(function () {
 
         Route::get('list/tracks', [PurchaseController::class, 'listTracks']);
+        Route::get('list/media', [PurchaseController::class, 'listMedia']);
+        Route::get('list/media/all', [PurchaseController::class, 'listMediaAll']);
+
         Route::get('track/details/{id}', [PurchaseController::class, 'trackDetails']);
         Route::get('asset/details/{id}', [PurchaseController::class, 'assetDetails']);
         // Purchase endpoints

@@ -42,39 +42,24 @@ class ConsumerController extends Controller
             $fourteenDaysAgo = now()->subDays(14);
 
             // Trending songs (last 14 days)
-            $trendingSongs = SongGeneration::query()
-                ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+            $assetForInvestment = SongGeneration::query()
+                ->with([
+                    'user:id,username,email,profile_image',
+                    'marketplaceAssets' => function ($q) {
+                        $q->where('is_active', true)
+                            ->where('sale_type', 'investment')
+                            ->limit(1); // only one asset per song
+                    }
+                ])
                 ->where('status', 'uploaded')
                 ->where('file_type', 'audio')
-                ->get()
-                ->filter(function ($song) {
-                    return $song->marketplaceAssets->count() > 0;
+                ->whereHas('marketplaceAssets', function ($q) {
+                    $q->where('is_active', true)
+                        ->where('sale_type', 'investment');
                 })
-                ->map(function ($song) use ($fourteenDaysAgo) {
-                    $assetsIds = $song->marketplaceAssets->where('is_active', true)->pluck('id')->toArray();
-
-                    $transactionsCount = 0;
-                    $totalRevenue = 0;
-
-                    if (!empty($assetsIds)) {
-                        $transactionsCount = MarketplacePurchase::whereIn('marketplace_asset_id', $assetsIds)
-                            ->where('created_at', '>=', $fourteenDaysAgo)
-                            ->count();
-
-                        $totalRevenue = MarketplacePurchase::whereIn('marketplace_asset_id', $assetsIds)
-                            ->where('created_at', '>=', $fourteenDaysAgo)
-                            ->sum('purchase_price');
-                    }
-
-                    $song->transactions_count = $transactionsCount;
-                    $song->total_revenue = (float) ($totalRevenue ?? 0);
-
-                    return $song;
-                })
-                ->sortByDesc('transactions_count')
-                ->sortByDesc('total_revenue')
-                ->take(5)
-                ->values();
+                ->latest('created_at')
+                ->limit(10)
+                ->get();
 
             // All tracks
             $allTracks = SongGeneration::query()
@@ -82,28 +67,20 @@ class ConsumerController extends Controller
                 ->where('status', 'uploaded')
                 ->where('file_type', 'audio')
                 ->orderByDesc('created_at')
-                ->paginate(15);
+                ->get();
 
             return response()->json([
                 'success' => true,
                 'featured_drops' => MediaResource::collection($featuredDrops),
-                'trending_assets' => MediaResource::collection($trendingSongs),
-                'all_tracks' => [
-                    'data' => MediaResource::collection($allTracks->items()),
-                    'pagination' => [
-                        'total' => $allTracks->total(),
-                        'per_page' => $allTracks->perPage(),
-                        'current_page' => $allTracks->currentPage(),
-                        'last_page' => $allTracks->lastPage(),
-                    ],
-                ],
+                'investment_assets' => MediaResource::collection($assetForInvestment),
+                'all_tracks' => MediaResource::collection($allTracks),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while fetching dashboard data.',
                 'error' => config('app.debug') ? $e->getMessage() : null,
-                
+
             ]);
         }
     }
@@ -130,6 +107,59 @@ class ConsumerController extends Controller
         }
     }
 
+    public function trackAgreement(int $id): JsonResponse
+    {
+        try {
+            $asset = SongGeneration::query()
+                ->where('status', 'uploaded')
+                ->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'agreement' => $asset->agreements,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Track not found. Invalid ID provided.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 404);
+        }
+    }
+
+    public function searchTracks(Request $request): JsonResponse
+    {
+        $query = $request->input('query');
+
+        if (!$query) {
+            return response()->json([
+                'success' => false,
+                'message' => 'query field is required.',
+            ], 400);
+        }
+
+        $tracks = SongGeneration::query()
+            ->with('user:id,username,email,profile_image', 'marketplaceAssets')
+            ->where('status', 'uploaded')
+            ->where('file_type', 'audio')
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                    ->orWhere('overview', 'like', "%{$query}%")
+                    ->orWhere('description', 'like', "%{$query}%")
+                    ->orWhere('agreements', 'like', "%{$query}%")
+                    ->orWhereHas('user', function ($q2) use ($query) {
+                        $q2->where('username', 'like', "%{$query}%");
+                    });
+            })
+            ->orderByDesc('created_at')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'results' => MediaResource::collection($tracks),
+        ]);
+    }
+
     public function myPurchases(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -148,17 +178,11 @@ class ConsumerController extends Controller
                 'seller:id,username,email,profile_image'
             ])
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->get();
 
         return response()->json([
             'success' => true,
             'data' => MarketplaceTransactionResource::collection($purchases),
-            'pagination' => [
-                'total' => $purchases->total(),
-                'per_page' => $purchases->perPage(),
-                'current_page' => $purchases->currentPage(),
-                'last_page' => $purchases->lastPage(),
-            ],
         ]);
     }
 

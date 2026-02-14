@@ -32,8 +32,8 @@ class InvestmentController extends Controller
                 'data' => [
                     'id' => $investment->id,
                     'asset' => $investment->asset,
-                    'blocks_purchased' => (int)$investment->blocks_purchased,
-                    'investment_amount' => (float)$investment->investment_amount,
+                    'blocks_purchased' => (int) $investment->blocks_purchased,
+                    'investment_amount' => (float) $investment->investment_amount,
                     'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
                     'invested_at' => $investment->created_at,
                     'earnings' => $earnings,
@@ -57,35 +57,29 @@ class InvestmentController extends Controller
 
             $investments = MarketplaceInvestment::where('user_id', $user->id)
                 ->with('asset:id,title,asset_type,total_valuation,price_per_block,max_available_blocks')
-                ->orderByDesc('created_at')
-                ->paginate(15);
-
-            $investments->getCollection()->transform(function ($investment) {
-                return [
-                    'id' => $investment->id,
-                    'asset' => $investment->asset,
-                    'blocks_purchased' => (int)$investment->blocks_purchased,
-                    'investment_amount' => (float)$investment->investment_amount,
-                    'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
-                    'invested_at' => $investment->created_at,
-                    'earnings' => $this->calculateInvestmentEarnings($investment),
-                ];
-            });
+                ->latest('created_at')
+                ->get()
+                ->map(function ($investment) {
+                    return [
+                        'id' => $investment->id,
+                        'asset' => $investment->asset,
+                        'blocks_purchased' => (int) $investment->blocks_purchased,
+                        'investment_amount' => (float) $investment->investment_amount,
+                        'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
+                        'invested_at' => $investment->created_at,
+                        'earnings' => $this->calculateInvestmentEarnings($investment),
+                    ];
+                });
 
             return response()->json([
                 'success' => true,
-                'data' => $investments->items(),
-                'pagination' => [
-                    'total' => $investments->total(),
-                    'per_page' => $investments->perPage(),
-                    'current_page' => $investments->currentPage(),
-                    'last_page' => $investments->lastPage(),
-                ],
+                'data' => $investments,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch investments',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -98,7 +92,7 @@ class InvestmentController extends Controller
         $asset = $investment->asset;
 
         // Base investment amount
-        $investmentAmount = (float)$investment->investment_amount;
+        $investmentAmount = (float) $investment->investment_amount;
 
         // Get current asset sales/revenue (excluding investments)
         $assetRevenue = MarketplaceTransaction::where('marketplace_asset_id', $asset->id)
@@ -106,13 +100,13 @@ class InvestmentController extends Controller
             ->where('transaction_type', '!=', 'investment')
             ->sum('amount');
 
-        $assetRevenue = (float)$assetRevenue;
+        $assetRevenue = (float) $assetRevenue;
 
         // Get total investment in this asset
         $totalInvestment = MarketplaceInvestment::where('marketplace_asset_id', $asset->id)
             ->sum('investment_amount');
 
-        $totalInvestment = (float)$totalInvestment;
+        $totalInvestment = (float) $totalInvestment;
 
         // Calculate user's share of revenue
         $userSharePercentage = $totalInvestment > 0 ? ($investmentAmount / $totalInvestment) * 100 : 0;
@@ -183,7 +177,7 @@ class InvestmentController extends Controller
                 ->with('asset:id,title,total_valuation')
                 ->get();
 
-            $totalInvested = (float)$investments->sum('investment_amount');
+            $totalInvested = (float) $investments->sum('investment_amount');
             $totalEarned = 0;
             $totalPending = 0;
             $averageRoi = 0;
@@ -213,8 +207,8 @@ class InvestmentController extends Controller
                     return [
                         'id' => $investment->id,
                         'asset_title' => $investment->asset->title,
-                        'blocks_purchased' => (int)$investment->blocks_purchased,
-                        'investment_amount' => round((float)$investment->investment_amount, 2),
+                        'blocks_purchased' => (int) $investment->blocks_purchased,
+                        'investment_amount' => round((float) $investment->investment_amount, 2),
                         'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
                         'earnings' => $this->calculateInvestmentEarnings($investment),
                         'invested_at' => $investment->created_at,
@@ -252,15 +246,15 @@ class InvestmentController extends Controller
             $totalInvestment = MarketplaceInvestment::where('marketplace_asset_id', $investment->marketplace_asset_id)
                 ->sum('investment_amount');
 
-            $userSharePercentage = $totalInvestment > 0 
-                ? (($investment->investment_amount / $totalInvestment) * 100) 
+            $userSharePercentage = $totalInvestment > 0
+                ? (($investment->investment_amount / $totalInvestment) * 100)
                 : 0;
 
             $platformFeePercentage = 5;
             $cumulativeEarnings = 0;
 
             $earningHistory = $transactions->map(function ($transaction) use ($userSharePercentage, $platformFeePercentage, &$cumulativeEarnings) {
-                $transactionAmount = (float)$transaction->amount;
+                $transactionAmount = (float) $transaction->amount;
                 $revenueAfterFee = $transactionAmount * ((100 - $platformFeePercentage) / 100);
                 $earningFromTransaction = ($revenueAfterFee * $userSharePercentage) / 100;
                 $cumulativeEarnings += $earningFromTransaction;
@@ -278,7 +272,7 @@ class InvestmentController extends Controller
             return response()->json([
                 'success' => true,
                 'asset' => $investment->asset,
-                'investment_amount' => round((float)$investment->investment_amount, 2),
+                'investment_amount' => round((float) $investment->investment_amount, 2),
                 'ownership_share_percentage' => round($userSharePercentage, 2),
                 'earning_history' => $earningHistory,
                 'total_transactions' => count($earningHistory),
