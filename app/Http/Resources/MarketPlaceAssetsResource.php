@@ -54,7 +54,7 @@ class MarketplaceAssetsResource extends JsonResource
                     'cover_image' => $this->songGeneration->cover_image
                         ? url(Storage::url($this->songGeneration->cover_image))
                         : null,
-                    'audio_file' => $this->songGeneration->file
+                    'file' => $this->songGeneration->file
                         ? url(Storage::url($this->songGeneration->file))
                         : null,
                     

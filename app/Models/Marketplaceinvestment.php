@@ -116,13 +116,18 @@ class MarketplaceInvestment extends Model
         return number_format($dailyEarnings * $daysSinceLastDistribution, 2);
     }
 
-    public function recordEarnings(string $amount, string $reason = ''): void
+    /**
+     * Record earnings (called after each purchase)
+     */
+    public function recordEarnings(float $amount, string $reason = 'dividend'): void
     {
         InvestmentDistribution::create([
             'marketplace_investment_id' => $this->id,
             'distribution_amount' => $amount,
+            'distribution_type' => $reason,
+            'status' => 'completed',
+            'notes' => $reason,
             'distribution_date' => now(),
-            'distribution_type' => $reason ?? 'dividend',
         ]);
 
         $this->increment('total_earned', $amount);

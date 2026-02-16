@@ -700,7 +700,28 @@ class CreatorController extends Controller
 
         try{
             $tracks = SongGeneration::with('marketplaceAssets')->where('user_id', $user->id)
-            ->where('file_type', 'audio')
+            ->whereNull('taskId')
+            ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => MediaResource::collection($tracks),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch tracks.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+    public function songsCreatedWithAI(Request $request){
+        $user = $request->user();
+
+        try{
+            $tracks = SongGeneration::with('marketplaceAssets')->where('user_id', $user->id)
+            ->whereNotNull('taskId')
             ->get();
 
             return response()->json([
@@ -722,7 +743,6 @@ class CreatorController extends Controller
 
         try{
             $track = SongGeneration::with('marketplaceAssets')->where('user_id', $user->id)
-            ->where('file_type', 'audio')
             ->where('id', $id)
             ->firstOrFail();
 

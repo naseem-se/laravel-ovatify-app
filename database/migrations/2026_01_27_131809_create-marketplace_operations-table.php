@@ -118,26 +118,12 @@ return new class extends Migration {
             $table->index('created_at');
         });
 
-        // Investment Distributions Table
-        Schema::create('investment_distributions', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('marketplace_investment_id');
-            $table->decimal('distribution_amount', 14, 2);
-            $table->timestamp('distribution_date');
-            $table->enum('distribution_type', ['dividend', 'roi', 'bonus', 'refund'])->default('dividend');
-            $table->enum('status', ['pending', 'paid'])->default('pending');
-            $table->timestamps();
-
-            $table->foreign('marketplace_investment_id')->references('id')->on('marketplace_investments')->onDelete('cascade');
-            $table->index('marketplace_investment_id');
-            $table->index('status');
-            $table->index('distribution_date');
-        });
+        
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('investment_distributions');
+        
         Schema::dropIfExists('marketplace_investments');
         Schema::dropIfExists('marketplace_licenses');
         Schema::dropIfExists('marketplace_purchases');

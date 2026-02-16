@@ -166,6 +166,7 @@ class ConsumerController extends Controller
 
         $purchases = $user->buyerTransactions()
             ->where('status', 'completed')
+            ->where('transaction_type', '!=', 'investment') // exclude investments from this list
             ->with([
                 'asset' => function ($query) {
                     $query->with([
@@ -312,6 +313,33 @@ class ConsumerController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
+    }
+
+    public function becomeCreator(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->role === 'creator') {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are already a creator.',
+            ], 400);
+        }
+
+        $user->role = 'creator';
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Your account has been updated to creator.',
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'role' => $user->role,
+                'profile_image' => $user->profile_image ? url(Storage::url($user->profile_image)) : null,
+            ],
+        ]);
     }
 
 

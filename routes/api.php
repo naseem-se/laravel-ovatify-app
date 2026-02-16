@@ -49,6 +49,7 @@ Route::middleware(['auth:sanctum', 'creator'])->group(function () {
         Route::post('upload/illustration/forlicense', [CreatorController::class, 'uploadMediaForLicense']);
 
         Route::post('my/tracks', [CreatorController::class, 'myTracks']);
+        Route::post('my/creation/with/ai', [CreatorController::class, 'songsCreatedWithAI']);
         Route::post('my/track/details/{id}', [CreatorController::class, 'myTrackDetails']);
 
 
@@ -69,6 +70,8 @@ Route::middleware(['auth:sanctum', 'consumer'])->group(function () {
         Route::get('my/purchases', [ConsumerController::class, 'myPurchases']);
         Route::get('my/purchase/details/{id}', [ConsumerController::class, 'myPurchaseDetails']);
         Route::post('download/purchased/asset/{id}', [ConsumerController::class, 'downloadPurchasedAsset']);
+
+        Route::post('become/creator', [ConsumerController::class, 'becomeCreator']);
     });
 });
 
@@ -112,18 +115,35 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['success' => true, 'user' => new UserResource($request->user())]);
     });
 
-    Route::get('/get/user/investments', [InvestmentController::class, 'getAllInvestments']);
-    Route::get('/get/user/investments/{investmentId}', [InvestmentController::class, 'getInvestmentDetails']);
-    Route::get('/get/user/investments/summary', [InvestmentController::class, 'getInvestmentSummary']);
-    Route::get('/get/user/investments/{investmentId}/history', [InvestmentController::class, 'getEarningHistory']);
 
+    Route::get('view/agreement/{id}', [ConsumerController::class, 'trackAgreement']);
     Route::post('/stripe/onboarding', [SellerBankAccountController::class, 'startOnboarding']);
-
     Route::get('/stripe/onboard/status', [SellerBankAccountController::class, 'getStatus']);
-
     Route::post('webhook/stripe', [WebhookController::class, 'handleStripeWebhook']);
-
     Route::post('auth/logout', [AuthController::class, 'logout']);
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Investment routes
+    Route::prefix('investments')->group(function () {
+        // Get all investments
+        Route::get('/', [InvestmentController::class, 'getAllInvestments']);
+
+        // Get investment summary/dashboard
+        Route::get('/summary', [InvestmentController::class, 'getInvestmentSummary']);
+
+        // Get specific investment details
+        Route::get('/{investmentId}', [InvestmentController::class, 'getInvestmentDetails']);
+
+        // Get earning history for investment
+        Route::get('/{investmentId}/earnings', [InvestmentController::class, 'getEarningHistory']);
+
+        // Request withdrawal
+        Route::post('/{investmentId}/withdraw', [InvestmentController::class, 'requestWithdrawal']);
+
+        // Get withdrawal history
+        Route::get('/{investmentId}/withdrawals', [InvestmentController::class, 'getWithdrawalHistory']);
+    });
 });
 
 

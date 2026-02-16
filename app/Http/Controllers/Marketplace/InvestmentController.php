@@ -4,16 +4,51 @@ namespace App\Http\Controllers\Marketplace;
 
 use App\Http\Controllers\Controller;
 use App\Models\MarketplaceInvestment;
-use App\Models\MarketplaceAsset;
-use App\Models\MarketplaceTransaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\InvestmentDistribution;
+use Illuminate\Support\Facades\Storage;
 
 class InvestmentController extends Controller
 {
     /**
-     * Get user's investment details with earnings
+     * Get all investments
+     */
+    public function getAllInvestments(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            $investments = MarketplaceInvestment::where('user_id', $user->id)
+                ->with([
+                    'asset:id,title,asset_type,song_generation_id', // include FK
+                ])
+                ->latest('created_at')
+                ->get()
+                ->map(function ($investment) {
+                    return $this->formatInvestmentData($investment);
+                });
+
+            $totalInvestments = $investments->sum('investment_amount');
+            $totalEarned = $investments->sum(fn($inv) => $inv['earnings']['total_earned']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $investments,
+                'total_investments' => $totalInvestments,
+                'total_earned' => $totalEarned,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch investments',
+            ], 500);
+        }
+    }
+
+    /**
+     * Get investment details
      */
     public function getInvestmentDetails(Request $request, int $investmentId): JsonResponse
     {
@@ -21,22 +56,41 @@ class InvestmentController extends Controller
             $user = $request->user();
 
             $investment = MarketplaceInvestment::where('user_id', $user->id)
-                ->with('asset:id,title,asset_type,total_valuation,price_per_block,max_available_blocks')
+                ->with([
+                    'asset:id,title,asset_type,song_generation_id', // include FK
+                    'asset.songGeneration:id,title,file,description,overview,agreements'
+                ])
                 ->findOrFail($investmentId);
 
-            // Calculate earnings
-            $earnings = $this->calculateInvestmentEarnings($investment);
+            // Get distribution history
+            $distributions = InvestmentDistribution::where('marketplace_investment_id', $investmentId)
+                ->orderByDesc('distribution_date')
+                ->paginate(20);
+
+            $earnings = $this->calculateEarnings($investment);
+
+            $song = $investment->asset?->songGeneration;
 
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'id' => $investment->id,
-                    'asset' => $investment->asset,
-                    'blocks_purchased' => (int) $investment->blocks_purchased,
-                    'investment_amount' => (float) $investment->investment_amount,
-                    'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
-                    'invested_at' => $investment->created_at,
-                    'earnings' => $earnings,
+                'investment' => $this->formatInvestmentData($investment),
+                'media' => $song ? [
+                    'id' => $song->id,
+                    'title' => $song->title,
+                    'file' => $song->file ? url(Storage::url($song->file)) : null,
+                    'description' => $song->description,
+                    'overview' => $song->overview,
+                    'agreement' => $song->agreements,
+                ] : null,
+                'earnings' => $earnings,
+                'distribution_history' => [
+                    'data' => $distributions->items(),
+                    'pagination' => [
+                        'total' => $distributions->total(),
+                        'per_page' => $distributions->perPage(),
+                        'current_page' => $distributions->currentPage(),
+                        'last_page' => $distributions->lastPage(),
+                    ],
                 ],
             ]);
         } catch (\Exception $e) {
@@ -48,125 +102,7 @@ class InvestmentController extends Controller
     }
 
     /**
-     * Get all user investments with earnings
-     */
-    public function getAllInvestments(Request $request): JsonResponse
-    {
-        try {
-            $user = $request->user();
-
-            $investments = MarketplaceInvestment::where('user_id', $user->id)
-                ->with('asset:id,title,asset_type,total_valuation,price_per_block,max_available_blocks')
-                ->latest('created_at')
-                ->get()
-                ->map(function ($investment) {
-                    return [
-                        'id' => $investment->id,
-                        'asset' => $investment->asset,
-                        'blocks_purchased' => (int) $investment->blocks_purchased,
-                        'investment_amount' => (float) $investment->investment_amount,
-                        'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
-                        'invested_at' => $investment->created_at,
-                        'earnings' => $this->calculateInvestmentEarnings($investment),
-                    ];
-                });
-
-            return response()->json([
-                'success' => true,
-                'data' => $investments,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to fetch investments',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Calculate investment earnings based on asset transactions
-     */
-    private function calculateInvestmentEarnings(MarketplaceInvestment $investment): array
-    {
-        $asset = $investment->asset;
-
-        // Base investment amount
-        $investmentAmount = (float) $investment->investment_amount;
-
-        // Get current asset sales/revenue (excluding investments)
-        $assetRevenue = MarketplaceTransaction::where('marketplace_asset_id', $asset->id)
-            ->where('status', 'completed')
-            ->where('transaction_type', '!=', 'investment')
-            ->sum('amount');
-
-        $assetRevenue = (float) $assetRevenue;
-
-        // Get total investment in this asset
-        $totalInvestment = MarketplaceInvestment::where('marketplace_asset_id', $asset->id)
-            ->sum('investment_amount');
-
-        $totalInvestment = (float) $totalInvestment;
-
-        // Calculate user's share of revenue
-        $userSharePercentage = $totalInvestment > 0 ? ($investmentAmount / $totalInvestment) * 100 : 0;
-
-        // Calculate earnings based on revenue share (after platform fee)
-        $platformFeePercentage = 5; // Platform keeps 5%
-        $revenueAfterFee = $assetRevenue * ((100 - $platformFeePercentage) / 100);
-        $userEarnings = ($revenueAfterFee * $userSharePercentage) / 100;
-
-        // Calculate pending earnings (total earned minus investment)
-        $pendingEarnings = $userEarnings - $investmentAmount;
-        $pendingEarnings = max(0, $pendingEarnings); // Don't show negative
-
-        // Calculate ROI
-        $roi = $investmentAmount > 0 ? (($userEarnings / $investmentAmount) * 100) : 0;
-
-        // Get investment transactions count
-        $transactionsCount = MarketplaceTransaction::where('marketplace_asset_id', $asset->id)
-            ->where('status', 'completed')
-            ->where('transaction_type', '!=', 'investment')
-            ->count();
-
-        // Days since investment
-        $daysSinceInvestment = $investment->created_at->diffInDays(now());
-        $daysSinceInvestment = max(1, $daysSinceInvestment); // At least 1 day
-
-        // Expected monthly earning based on daily average
-        $dailyEarning = $userEarnings / $daysSinceInvestment;
-        $expectedMonthlyEarning = $dailyEarning * 30;
-
-        return [
-            'total_earned' => round($userEarnings, 2),
-            'invested_amount' => round($investmentAmount, 2),
-            'pending_earnings' => round($pendingEarnings, 2),
-            'roi_percentage' => round($roi, 2),
-            'ownership_share_percentage' => round($userSharePercentage, 2),
-            'asset_total_revenue' => round($assetRevenue, 2),
-            'transactions_count' => $transactionsCount,
-            'days_invested' => $daysSinceInvestment,
-            'expected_monthly_earning' => round($expectedMonthlyEarning, 2),
-            'expected_daily_earning' => round($dailyEarning, 2),
-        ];
-    }
-
-    /**
-     * Calculate ownership percentage
-     */
-    private function calculateOwnershipPercentage(MarketplaceInvestment $investment): float
-    {
-        $asset = $investment->asset;
-
-        if (!$asset->max_available_blocks || $asset->max_available_blocks == 0) {
-            return 0;
-        }
-
-        return round(($investment->blocks_purchased / $asset->max_available_blocks) * 100, 2);
-    }
-
-    /**
-     * Get investment dashboard summary
+     * Get investment summary dashboard
      */
     public function getInvestmentSummary(Request $request): JsonResponse
     {
@@ -174,46 +110,52 @@ class InvestmentController extends Controller
             $user = $request->user();
 
             $investments = MarketplaceInvestment::where('user_id', $user->id)
-                ->with('asset:id,title,total_valuation')
+                ->with('asset:id,title')
                 ->get();
 
-            $totalInvested = (float) $investments->sum('investment_amount');
-            $totalEarned = 0;
-            $totalPending = 0;
-            $averageRoi = 0;
+            $summary = [
+                'total_invested' => 0,
+                'total_earned' => 0,
+                'total_withdrawn' => 0,
+                'total_pending' => 0,
+                'average_roi' => 0,
+                'total_investments' => $investments->count(),
+            ];
 
-            foreach ($investments as $investment) {
-                $earnings = $this->calculateInvestmentEarnings($investment);
-                $totalEarned += $earnings['total_earned'];
-                $totalPending += $earnings['pending_earnings'];
-            }
+            $investmentsData = $investments->map(function ($investment) use (&$summary) {
+                $earnings = $this->calculateEarnings($investment);
+                $summary['total_invested'] += $earnings['investment_amount'];
+                $summary['total_earned'] += $earnings['total_earned'];
+                $summary['total_withdrawn'] += $earnings['total_withdrawn'];
+                $summary['total_pending'] += $earnings['pending_earnings'];
+
+                return [
+                    'id' => $investment->id,
+                    'asset_title' => $investment->asset->title,
+                    'blocks_purchased' => (int) $investment->blocks_purchased,
+                    'investment_amount' => (float) $investment->investment_amount,
+                    'ownership_percentage' => (float) $investment->ownership_percentage,
+                    'earnings' => $earnings,
+                    'invested_at' => $investment->created_at,
+                ];
+            })->toArray();
 
             // Calculate average ROI
-            if ($totalInvested > 0) {
-                $averageRoi = (($totalEarned / $totalInvested) * 100);
+            if ($summary['total_invested'] > 0) {
+                $summary['average_roi'] = round(($summary['total_earned'] / $summary['total_invested']) * 100, 2);
             }
+
+            // Round all summary values
+            $summary['total_invested'] = round($summary['total_invested'], 2);
+            $summary['total_earned'] = round($summary['total_earned'], 2);
+            $summary['total_withdrawn'] = round($summary['total_withdrawn'], 2);
+            $summary['total_pending'] = round($summary['total_pending'], 2);
+            $summary['total_profit'] = round($summary['total_earned'] - $summary['total_invested'], 2);
 
             return response()->json([
                 'success' => true,
-                'summary' => [
-                    'total_invested' => round($totalInvested, 2),
-                    'total_earned' => round($totalEarned, 2),
-                    'total_pending' => round($totalPending, 2),
-                    'total_profit' => round(($totalEarned - $totalInvested), 2),
-                    'average_roi' => round($averageRoi, 2),
-                    'total_investments' => $investments->count(),
-                ],
-                'investments' => $investments->map(function ($investment) {
-                    return [
-                        'id' => $investment->id,
-                        'asset_title' => $investment->asset->title,
-                        'blocks_purchased' => (int) $investment->blocks_purchased,
-                        'investment_amount' => round((float) $investment->investment_amount, 2),
-                        'ownership_percentage' => $this->calculateOwnershipPercentage($investment),
-                        'earnings' => $this->calculateInvestmentEarnings($investment),
-                        'invested_at' => $investment->created_at,
-                    ];
-                })->toArray(),
+                'summary' => $summary,
+                'investments' => $investmentsData,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -224,7 +166,7 @@ class InvestmentController extends Controller
     }
 
     /**
-     * Get investment earning history
+     * Get earning history for specific investment
      */
     public function getEarningHistory(Request $request, int $investmentId): JsonResponse
     {
@@ -235,53 +177,182 @@ class InvestmentController extends Controller
                 ->with('asset:id,title')
                 ->findOrFail($investmentId);
 
-            // Get all transactions for this asset
-            $transactions = MarketplaceTransaction::where('marketplace_asset_id', $investment->marketplace_asset_id)
-                ->where('status', 'completed')
-                ->where('transaction_type', '!=', 'investment')
-                ->orderByDesc('created_at')
-                ->get();
-
-            // Calculate cumulative earnings per transaction
-            $totalInvestment = MarketplaceInvestment::where('marketplace_asset_id', $investment->marketplace_asset_id)
-                ->sum('investment_amount');
-
-            $userSharePercentage = $totalInvestment > 0
-                ? (($investment->investment_amount / $totalInvestment) * 100)
-                : 0;
-
-            $platformFeePercentage = 5;
-            $cumulativeEarnings = 0;
-
-            $earningHistory = $transactions->map(function ($transaction) use ($userSharePercentage, $platformFeePercentage, &$cumulativeEarnings) {
-                $transactionAmount = (float) $transaction->amount;
-                $revenueAfterFee = $transactionAmount * ((100 - $platformFeePercentage) / 100);
-                $earningFromTransaction = ($revenueAfterFee * $userSharePercentage) / 100;
-                $cumulativeEarnings += $earningFromTransaction;
-
-                return [
-                    'transaction_id' => $transaction->id,
-                    'type' => $transaction->transaction_type,
-                    'amount' => round($transactionAmount, 2),
-                    'earning_from_this' => round($earningFromTransaction, 2),
-                    'cumulative_earning' => round($cumulativeEarnings, 2),
-                    'date' => $transaction->completed_at,
-                ];
-            })->toArray();
+            // Get earnings only
+            $earnings = InvestmentDistribution::where('marketplace_investment_id', $investmentId)
+                ->where('distribution_type', 'dividend')
+                ->orderByDesc('distribution_date')
+                ->paginate(20);
 
             return response()->json([
                 'success' => true,
                 'asset' => $investment->asset,
-                'investment_amount' => round((float) $investment->investment_amount, 2),
-                'ownership_share_percentage' => round($userSharePercentage, 2),
-                'earning_history' => $earningHistory,
-                'total_transactions' => count($earningHistory),
+                'investment_amount' => (float) $investment->investment_amount,
+                'data' => $earnings->items(),
+                'pagination' => [
+                    'total' => $earnings->total(),
+                    'per_page' => $earnings->perPage(),
+                    'current_page' => $earnings->currentPage(),
+                    'last_page' => $earnings->lastPage(),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch earning history',
+            ], 404);
+        }
+    }
+
+    /**
+     * Request earnings withdrawal
+     */
+    public function requestWithdrawal(Request $request, int $investmentId): JsonResponse
+    {
+        try {
+            $request->validate([
+                'amount' => 'required|numeric|min:0.01',
+            ]);
+
+            $user = $request->user();
+
+            $investment = MarketplaceInvestment::where('user_id', $user->id)
+                ->findOrFail($investmentId);
+
+            $earnings = $this->calculateEarnings($investment);
+
+            if ($request->amount > $earnings['pending_earnings']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Requested amount exceeds pending earnings',
+                    'pending_earnings' => round($earnings['pending_earnings'], 2),
+                ], 422);
+            }
+
+            // Create withdrawal request
+            $withdrawal = InvestmentDistribution::create([
+                'marketplace_investment_id' => $investment->id,
+                'distribution_amount' => $request->amount,
+                'distribution_type' => 'withdrawal',
+                'status' => 'pending',
+                'notes' => 'Withdrawal request',
+                'distribution_date' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Withdrawal request submitted',
+                'withdrawal' => [
+                    'id' => $withdrawal->id,
+                    'amount' => round((float) $request->amount, 2),
+                    'status' => 'pending',
+                    'requested_at' => $withdrawal->created_at,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Withdrawal request failed',
             ], 500);
         }
+    }
+
+    /**
+     * Get withdrawal history
+     */
+    public function getWithdrawalHistory(Request $request, int $investmentId): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            $investment = MarketplaceInvestment::where('user_id', $user->id)
+                ->findOrFail($investmentId);
+
+            $withdrawals = InvestmentDistribution::where('marketplace_investment_id', $investmentId)
+                ->where('distribution_type', 'withdrawal')
+                ->orderByDesc('distribution_date')
+                ->paginate(20);
+
+            return response()->json([
+                'success' => true,
+                'data' => $withdrawals->items(),
+                'pagination' => [
+                    'total' => $withdrawals->total(),
+                    'per_page' => $withdrawals->perPage(),
+                    'current_page' => $withdrawals->currentPage(),
+                    'last_page' => $withdrawals->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch withdrawal history',
+            ], 404);
+        }
+    }
+
+    /**
+     * Helper: Format investment data
+     */
+    private function formatInvestmentData(MarketplaceInvestment $investment): array
+    {
+        $earnings = $this->calculateEarnings($investment);
+
+        return [
+            'id' => $investment->id,
+            'asset' => [
+                'id' => $investment->asset?->id,
+                'title' => $investment->asset?->title,
+                'type' => $investment->asset?->asset_type,
+            ],
+            'blocks_purchased' => (int) $investment->blocks_purchased,
+            'investment_amount' => (float) $investment->investment_amount,
+            'ownership_percentage' => (float) $investment->ownership_percentage,
+            'expected_roi' => (float) ($investment->expected_roi ?? 0),
+            'earnings' => $earnings,
+            'invested_at' => $investment->created_at,
+        ];
+    }
+
+    /**
+     * Helper: Calculate earnings from distributions
+     */
+    private function calculateEarnings(MarketplaceInvestment $investment): array
+    {
+        $investmentAmount = (float) $investment->investment_amount;
+
+        // Total earned (from dividends/earnings)
+        $totalEarned = (float) InvestmentDistribution::where('marketplace_investment_id', $investment->id)
+            ->where('distribution_type', 'dividend')
+            ->where('status', 'completed')
+            ->sum('distribution_amount');
+
+        // Total withdrawn
+        $totalWithdrawn = (float) InvestmentDistribution::where('marketplace_investment_id', $investment->id)
+            ->where('distribution_type', 'withdrawal')
+            ->where('status', 'completed')
+            ->sum('distribution_amount');
+
+        // Pending withdrawal requests
+        $pendingWithdrawals = (float) InvestmentDistribution::where('marketplace_investment_id', $investment->id)
+            ->where('distribution_type', 'withdrawal')
+            ->where('status', 'pending')
+            ->sum('distribution_amount');
+
+        // Pending earnings = total earned - withdrawn - pending withdrawals
+        $pendingEarnings = $totalEarned - $totalWithdrawn - $pendingWithdrawals;
+        $pendingEarnings = max(0, $pendingEarnings);
+
+        // ROI
+        $roi = $investmentAmount > 0 ? (($totalEarned / $investmentAmount) * 100) : 0;
+
+        return [
+            'investment_amount' => round($investmentAmount, 2),
+            'total_earned' => round($totalEarned, 2),
+            'total_withdrawn' => round($totalWithdrawn, 2),
+            'pending_withdrawals' => round($pendingWithdrawals, 2),
+            'pending_earnings' => round($pendingEarnings, 2),
+            'roi_percentage' => round($roi, 2),
+            'profit' => round($totalEarned - $investmentAmount, 2),
+        ];
     }
 }

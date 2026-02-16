@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use App\Http\Resources\MarketplaceAssetsResource;
 use App\Http\Resources\MediaResource;
 use App\Models\SongGeneration;
+use App\Models\InvestmentDistribution;
 
 class PurchaseController extends Controller
 {
@@ -158,6 +159,16 @@ class PurchaseController extends Controller
                 paymentData: $request->only(['payment_method', 'payment_token'])
             );
 
+            // Record investment as initial distribution
+            InvestmentDistribution::create([
+                'marketplace_investment_id' => $investment->id,
+                'distribution_amount' => $investment->investment_amount,
+                'distribution_type' => 'investment',
+                'status' => 'completed',
+                'notes' => 'Initial investment of ' . $request->blocks . ' blocks',
+                'distribution_date' => now(),
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Investment successful',
@@ -165,10 +176,10 @@ class PurchaseController extends Controller
                     'id' => $investment->id,
                     'asset_id' => $investment->marketplace_asset_id,
                     'blocks_purchased' => $investment->blocks_purchased,
-                    'investment_amount' => $investment->investment_amount,
-                    'ownership_percentage' => $investment->ownership_percentage,
+                    'investment_amount' => (float) $investment->investment_amount,
+                    'ownership_percentage' => (float) $investment->ownership_percentage,
                     'expected_roi' => $investment->expected_roi,
-                    'certificate_of_ownership' => $investment->generateCertificate(),
+                    'invested_at' => $investment->created_at,
                 ],
             ], 201);
         } catch (PurchaseException $e) {

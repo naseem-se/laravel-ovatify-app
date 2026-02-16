@@ -17,10 +17,11 @@ class InvestmentDistribution extends Model
         'distribution_date',
         'distribution_type',
         'status',
+        'notes',
     ];
 
     protected $casts = [
-        'distribution_amount' => 'decimal:2',
+        'distribution_amount' => 'float',
         'distribution_date' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -41,8 +42,61 @@ class InvestmentDistribution extends Model
         return $query->where('status', 'pending');
     }
 
-    public function scopePaid(Builder $query): Builder
+    public function scopeCompleted(Builder $query): Builder
     {
-        return $query->where('status', 'paid');
+        return $query->where('status', 'completed');
+    }
+
+    public function scopeByStatus(Builder $query, string $status): Builder
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Get formatted amount
+     */
+    public function getFormattedAmount(): string
+    {
+        return '$' . number_format($this->distribution_amount, 2);
+    }
+
+    /**
+     * Check if distribution is completed
+     */
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    /**
+     * Check if distribution is pending
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    /**
+     * Mark as completed
+     */
+    public function markAsCompleted(): void
+    {
+        $this->update(['status' => 'completed']);
+    }
+
+    /**
+     * Mark as pending
+     */
+    public function markAsPending(): void
+    {
+        $this->update(['status' => 'pending']);
+    }
+
+    /**
+     * Mark as failed
+     */
+    public function markAsFailed(): void
+    {
+        $this->update(['status' => 'failed']);
     }
 }
