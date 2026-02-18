@@ -166,7 +166,7 @@ class ConsumerController extends Controller
 
         $purchases = $user->buyerTransactions()
             ->where('status', 'completed')
-            ->where('transaction_type', '!=', 'investment') // exclude investments from this list
+            ->where('transaction_type', '!=', 'investment')
             ->with([
                 'asset' => function ($query) {
                     $query->with([
@@ -180,6 +180,14 @@ class ConsumerController extends Controller
             ])
             ->orderByDesc('created_at')
             ->get();
+
+        if ($purchases->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'No purchases found',
+                'data' => []
+            ], 200);
+        }
 
         return response()->json([
             'success' => true,
@@ -295,7 +303,7 @@ class ConsumerController extends Controller
             return response()->json(
                 [
                     'success' => true,
-                    'download_url' => url(Storage::disk('public')->url($filePath)),
+                    'download_url' => Storage::url($filePath),
                 ]
             );
 
