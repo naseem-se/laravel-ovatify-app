@@ -4,155 +4,227 @@
 <head>
     <meta charset="UTF-8">
     <title>Create New Password | Ovatify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite('resources/css/app.css')
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            background-color: #0D0D0D;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            color: white;
+        }
+
+        .text-magenta {
+            color: #FF00FF !important;
+        }
+
+        .text-purple {
+            color: #8A3FFC !important;
+        }
+
+        .input-dark {
+            background-color: #1A1A1A;
+            border: 1px solid transparent;
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+
+        .input-dark:focus {
+            border-color: rgba(255, 0, 255, 0.4);
+            outline: none;
+            background-color: #222222;
+        }
+
+        .input-dark::placeholder {
+            color: #444444;
+            font-weight: 500;
+        }
+
+        .btn-blue {
+            background-color: #4D61FF;
+            transition: all 0.2s ease;
+        }
+
+        .btn-blue:hover {
+            background-color: #3D51EF;
+            box-shadow: 0 10px 40px rgba(77, 97, 255, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
 </head>
 
-<body class="min-h-screen bg-[#0f0f10] text-white flex items-center justify-center">
+<body class="min-h-screen flex items-center justify-center p-6 bg-[#0D0D0D]">
 
-    <div class="w-full max-w-6xl px-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <div class="w-full max-w-[1200px] grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
 
-        <!-- LEFT SIDE -->
-        <div>
-            <!-- Brand -->
-            <h1 class="text-purple-500 text-lg font-bold tracking-wide mb-6">
-                Ovatify
-            </h1>
-
-            <h2 class="text-2xl font-semibold text-fuchsia-500 mb-2">
-                Create new password
-            </h2>
-
-            <p class="text-sm text-white-400 mb-6 mt-16">
-                Create Your New Password
-            </p>
-
-            <!-- Password Input -->
-            <div class="relative mb-4">
-                <input type="password" placeholder="********"
-                    class="w-full bg-[#1a1a1d] border border-[#2a2a2e]
-                       rounded-lg px-4 py-3
-                       text-sm text-gray-200
-                       placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
-                <!-- Eye Icon -->
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
-                             -1.274 4.057-5.064 7-9.542 7
-                             -4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </span>
+        {{-- Left Section: Create Password --}}
+        <div class="max-w-[420px] w-full mx-auto lg:ml-0" x-data="{ showPass: false }">
+            <div class="mb-10 text-left">
+                <h1 class="text-[18px] font-semibold text-purple mb-2 tracking-tight">Ovatify</h1>
+                <h2 class="text-[32px] font-bold text-magenta leading-tight tracking-tight">Create new password</h2>
             </div>
 
-            <!-- Remember Me -->
-            <div class="flex items-center mb-6">
-                <input type="checkbox" checked
-                    class="w-4 h-4 rounded border-[#3f3f46]
-                       bg-[#1a1a1d] text-blue-600
-                       focus:ring-blue-500">
-                <label class="ml-2 text-xs text-gray-400">
-                    Remember me
-                </label>
-            </div>
+            <div id="error-message" class="bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-4 rounded-xl text-[12px] font-bold mb-6 hidden"></div>
 
-            <!-- Buttons -->
-            <div class="space-y-4 w-full">
-                <button onclick="showSuccessModal()" type="button"
-                    class="w-full py-3 rounded-lg
-                       bg-blue-600 hover:bg-blue-500
-                       text-sm font-medium transition">
-                    Create
-                </button>
+            <form id="reset-form" class="space-y-6">
+                @csrf
+                <div class="space-y-2">
+                    <label class="text-[13px] font-semibold text-white/90">Create Your New Password</label>
+                    <div class="relative">
+                        <input :type="showPass ? 'text' : 'password'" id="password" name="password" placeholder="********"
+                            class="w-full input-dark rounded-xl px-5 py-4 text-[13px] font-medium pr-12" required minlength="8">
+                        <button type="button" @click="showPass = !showPass"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors">
+                            <i class="fas" :class="showPass ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                </div>
 
-                <button onclick="window.location.href='{{ route('login') }}'"
-                    class="w-full py-3 rounded-lg
-                       border border-[#3f3f46]
-                       text-sm text-gray-300
-                       hover:bg-[#1c1c1f] transition">
-                    Back
-                </button>
-            </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" checked
+                        class="w-4 h-4 rounded border-white/10 bg-[#1A1A1A] text-[#4D61FF] focus:ring-[#4D61FF] focus:ring-offset-0">
+                    <label class="text-[12px] font-semibold text-white/40">Remember me</label>
+                </div>
+
+                <div class="pt-4 space-y-4">
+                    <button type="submit" id="submit-btn"
+                        class="w-full btn-blue py-4 rounded-xl font-bold text-[15px] text-white shadow-lg shadow-blue-500/10">
+                        Create
+                    </button>
+                    <button type="button" onclick="window.location.href='{{ route('login') }}'"
+                        class="w-full bg-transparent border border-white/5 py-4 rounded-xl font-bold text-[15px] text-white/40 hover:bg-white/5 transition-all">
+                        Back
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <!-- RIGHT SIDE (ILLUSTRATION) -->
-        <div class="hidden md:flex items-center justify-center relative">
-
-            <!-- Illustration -->
-            <img src="{{ asset('images/createpass.PNG') }}" alt="Create Password Illustration"
-                class="relative z-10 max-w-md" />
-
+        {{-- Right Section: Illustration --}}
+        <div class="hidden lg:flex items-center justify-center relative">
+            <img src="{{ asset('images/createpass.PNG') }}" alt="Illustration"
+                class="w-full max-w-[550px] h-auto drop-shadow-[0_0_50px_rgba(255,0,255,0.1)]">
         </div>
 
     </div>
 
-    <!-- SUCCESS MODAL -->
+    {{-- SUCCESS MODAL (Figma Match) --}}
     <div id="successModal"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm
-           hidden items-center justify-center z-50">
-
+        class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-6">
         <div
-            class="bg-[#1a1a1d] rounded-2xl
-                px-10 py-12
-                text-center
-                max-w-md w-full
-                animate-fadeIn">
+            class="bg-[#141414] rounded-[40px] p-12 text-center max-w-[480px] w-full border border-white/5 animate-fadeIn relative overflow-hidden">
 
-            <!-- Icon -->
-            <div
-                class="relative mx-auto mb-6 w-28 h-28
-                    rounded-full bg-fuchsia-600
-                    flex items-center justify-center">
+            {{-- Magenta Background Glow/Circle --}}
+            <div class="relative mx-auto mb-10 w-32 h-32 flex items-center justify-center">
+                <div class="absolute inset-0 bg-magenta rounded-full shadow-[0_0_60px_rgba(255,0,255,0.4)]"></div>
 
-                <!-- Floating dots -->
-                <span class="absolute -top-2 -left-2 w-3 h-3 bg-fuchsia-500 rounded-full"></span>
-                <span class="absolute top-4 -right-3 w-2 h-2 bg-fuchsia-500 rounded-full"></span>
-                <span class="absolute bottom-3 -left-3 w-2.5 h-2.5 bg-fuchsia-500 rounded-full"></span>
+                {{-- Floating Dots (Animated) --}}
+                <div class="absolute inset-[-20px] animate-dot-spin pointer-events-none">
+                    <div
+                        class="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-magenta rounded-full shadow-[0_0_10px_#FF00FF]">
+                    </div>
+                    <div class="absolute bottom-4 left-4 w-1.5 h-1.5 bg-magenta/60 rounded-full"></div>
+                    <div
+                        class="absolute top-1/4 right-0 w-2.5 h-2.5 bg-magenta/80 rounded-full shadow-[0_0_8px_#FF00FF]">
+                    </div>
+                    <div class="absolute bottom-0 right-1/4 w-1.5 h-1.5 bg-magenta/40 rounded-full"></div>
+                </div>
 
-                <!-- Shield Check -->
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2.5"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 4v6c0 5-3.5 9-7 10
-                         -3.5-1-7-5-7-10V6l7-4z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
-                </svg>
-            </div>
-
-            <!-- Text -->
-            <h2 class="text-xl font-semibold mb-2">
-                Congratulations!
-            </h2>
-
-            <p class="text-sm text-gray-400 mb-8">
-                Your account is ready to use.
-                You will be redirected to the Home page in a few seconds..
-            </p>
-
-            <!-- Loader -->
-            <div class="flex justify-center">
-                <div
-                    class="w-10 h-10 border-4 border-fuchsia-500
-                        border-t-transparent rounded-full animate-spin">
+                {{-- Shield Icon --}}
+                <div class="relative z-10 text-white text-4xl">
+                    <i class="fas fa-shield-halved"></i>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i class="fas fa-check text-[14px] mt-1 text-magenta"></i>
+                    </div>
                 </div>
             </div>
 
+            <div class="space-y-4 mb-12">
+                <h2 class="text-[32px] font-black tracking-tighter text-white">Congratulations!</h2>
+                <p class="text-[14px] text-white/40 font-medium leading-relaxed px-6">
+                    Your account is ready to use. You will be redirected to the Home page in a few seconds..
+                </p>
+            </div>
+
+            {{-- Custom Magenta Spinner --}}
+            <div class="flex justify-center">
+                <div class="w-10 h-10 border-[3px] border-magenta/10 border-t-magenta rounded-full animate-spin"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        document.getElementById('reset-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const errorDiv = document.getElementById('error-message');
+            const password = document.getElementById('password').value;
+            const token = document.querySelector('input[name="_token"]').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch("{{ route('reset.password.post') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showSuccessModal();
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Create';
+                    errorDiv.textContent = data.message || 'An error occurred. Please try again.';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = 'Create';
+                errorDiv.textContent = 'A network error occurred.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
         function showSuccessModal() {
             const modal = document.getElementById('successModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            // Redirect after 3.5 seconds
             setTimeout(() => {
-                window.location.href = "{{ route('login') }}";
-            }, 3500);
+                window.location.href = "{{ route('consumer.dashboard.index') }}";
+            }, 3000);
         }
     </script>
-
 
 </body>
 

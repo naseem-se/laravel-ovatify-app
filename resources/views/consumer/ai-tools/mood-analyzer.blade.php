@@ -1,52 +1,80 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20 relative" x-data="{ state: 'results' }">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Mood Analyzer</h1>
-    </div>
+        {{-- Top Navigation (Figma Match) --}}
+        <div class="flex items-center gap-6 pt-2 mb-10">
+            <a href="{{ route('consumer.creator.dashboard') }}" class="text-[#4D61FF] hover:opacity-80 transition-all">
+                <i class="fas fa-arrow-left text-[22px]"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-[34px] font-bold tracking-tight">Mood Analyzer</h1>
+        </div>
 
-    {{-- Track Info --}}
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold">Lorem Ipsum</h2>
-        <p class="text-sm text-gray-400">beat.wav - 120 BPM - 2.3 MB</p>
-    </div>
+        <div class="space-y-4 mb-10">
+            <h2 class="text-white text-[28px] font-bold">Lorem Ipsum</h2>
+            <p class="text-white/30 text-[16px] font-medium">beat.wav - 120 BPM - 2.3 MB</p>
+        </div>
 
-    {{-- Audio Player --}}
-    <div class="p-6 rounded-xl bg-[#252525] mb-6">
-        <div class="flex items-center gap-4">
-            {{-- Play Button --}}
+        {{-- Playback Feedback (Figma Match) --}}
+        <div class="bg-[#141414] rounded-[32px] p-8 border border-white/[0.03] flex items-center gap-8 mb-16 shadow-2xl">
             <button
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 hover:bg-accent/30 transition">
-                <svg class="w-6 h-6 text-accent ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                </svg>
+                class="w-14 h-14 bg-magenta rounded-full flex items-center justify-center shadow-xl group hover:scale-105 transition-transform">
+                <i class="fas fa-play text-white text-xl ml-1"></i>
             </button>
+            <div class="flex-1 flex items-center gap-[4px] h-10 opacity-40">
+                @for($i = 0; $i < 65; $i++)
+                    <div class="w-[3px] bg-[#4D61FF] rounded-full" style="height: {{ rand(20, 100) }}%"></div>
+                @endfor
+            </div>
+            <span class="text-white/30 text-[14px] font-bold">02:00</span>
+        </div>
 
-            {{-- Waveform --}}
-            <div class="flex-1 flex items-center justify-center gap-0.5 h-12">
-                @foreach([20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30, 42, 25, 35, 28, 40, 22, 34, 38, 20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30, 42, 25, 35, 28, 40, 22, 34, 38, 20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30] as $h)
-                    <div class="w-1 rounded-full bg-[#4155B1]" style="height: {{ $h }}px;"></div>
-                @endforeach
+        {{-- Analysis Results (Figma Match) --}}
+        <div class="space-y-12 mb-16">
+            <div class="space-y-3">
+                <h3 class="text-white text-[22px] font-bold">Analysis result</h3>
+                <p class="text-white/30 text-[16px] font-medium">Based on the analysis of your audio, here are Mood matches
+                </p>
             </div>
 
-            {{-- Duration --}}
-            <span class="text-sm text-gray-400">02:00</span>
-        </div>
-    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="space-y-6">
+                    <h4 class="text-white text-[20px] font-bold">Primary Mood</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-white/50 text-[17px] font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full bg-magenta/40"></span>
+                            Energetic
+                        </li>
+                        <li class="flex items-center gap-3 text-white/50 text-[17px] font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full bg-magenta/40"></span>
+                            Uplifting
+                        </li>
+                    </ul>
+                </div>
 
-    {{-- Analyzing Progress --}}
-    <div class="p-6 rounded-xl bg-[#252525]">
-        <p class="text-sm text-gray-300 mb-3">Analyzing Mood...</p>
-        <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-[#4D61FF] to-accent animate-progress rounded-full"></div>
+                <div class="space-y-6">
+                    <h4 class="text-white text-[20px] font-bold">Secondary Mood</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-white/50 text-[17px] font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#4D61FF]/40"></span>
+                            Energetic
+                        </li>
+                        <li class="flex items-center gap-3 text-white/50 text-[17px] font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#4D61FF]/40"></span>
+                            Uplifting
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
 
+        <div class="pt-10">
+            <button onclick="window.location.href='{{ route('consumer.forms.success.track-ready') }}'"
+                class="w-full py-6 bg-[#4D61FF] text-white font-bold text-[20px] rounded-2xl shadow-xl shadow-[#4D61FF]/10 hover:bg-[#3D51EF] transition-all active:scale-[0.995]">
+                Apply & Continue
+            </button>
+        </div>
+
+    </div>
 @endsection

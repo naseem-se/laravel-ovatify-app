@@ -1,52 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20 relative">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">AI Mixing Assistant</h1>
-    </div>
+        {{-- Top Navigation (Figma Match) --}}
+        <div class="flex items-center gap-6 pt-2 mb-10">
+            <a href="{{ route('consumer.creator.dashboard') }}" class="text-[#4D61FF] hover:opacity-80 transition-all">
+                <i class="fas fa-arrow-left text-[22px]"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-[34px] font-bold tracking-tight">AI Mixing Assistant</h1>
+        </div>
 
-    {{-- Track Info --}}
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold">Lorem Ipsum</h2>
-        <p class="text-sm text-gray-400">beat.wav - 120 BPM - 2.3 MB</p>
-    </div>
+        <div class="space-y-4 mb-10">
+            <h2 class="text-white text-[28px] font-bold">Lorem Ipsum</h2>
+            <p class="text-white/30 text-[16px] font-medium">beat.wav - 120 BPM - 2.3 MB</p>
+        </div>
 
-    {{-- Audio Player --}}
-    <div class="p-6 rounded-xl bg-[#252525] mb-6">
-        <div class="flex items-center gap-4">
-            {{-- Play Button --}}
+        {{-- Playback Feedback (Figma Match) --}}
+        <div
+            class="bg-[#141414] rounded-[32px] p-8 border border-white/[0.03] flex items-center gap-8 mb-16 shadow-2xl relative overflow-hidden">
             <button
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-accent/20 hover:bg-accent/30 transition">
-                <svg class="w-6 h-6 text-accent ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                </svg>
+                class="w-14 h-14 bg-magenta rounded-full flex items-center justify-center shadow-xl group hover:scale-105 transition-transform relative z-10">
+                <i class="fas fa-play text-white text-xl ml-1"></i>
             </button>
-
-            {{-- Waveform --}}
-            <div class="flex-1 flex items-center justify-center gap-0.5 h-12">
-                @foreach([20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30, 42, 25, 35, 28, 40, 22, 34, 38, 20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30, 42, 25, 35, 28, 40, 22, 34, 38, 20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30] as $h)
-                    <div class="w-1 rounded-full bg-[#4155B1]" style="height: {{ $h }}px;"></div>
-                @endforeach
+            <div class="flex-1 flex items-center gap-[4px] h-10 opacity-40 relative z-10">
+                @for($i = 0; $i < 65; $i++)
+                    <div class="w-[3px] bg-[#4D61FF] rounded-full" style="height: {{ rand(20, 100) }}%"></div>
+                @endfor
             </div>
-
-            {{-- Duration --}}
-            <span class="text-sm text-gray-400">02:00</span>
+            <span class="text-white/30 text-[14px] font-bold relative z-10">02:00</span>
         </div>
+
+        {{-- Analyzing State (Figma Match) --}}
+        <div class="bg-[#141414] rounded-[32px] p-10 border border-white/[0.03] shadow-2xl space-y-8">
+            <p class="text-white text-[18px] font-semibold opacity-90">Analyzing Your Track...</p>
+
+            <div class="relative w-full h-[6px] bg-white/[0.05] rounded-full overflow-hidden">
+                <div
+                    class="absolute left-0 top-0 h-full bg-[#4D61FF] rounded-full w-2/3 shadow-[0_0_15px_rgba(77,97,255,0.4)] animate-pulse">
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    {{-- Analyzing Progress --}}
-    <div class="p-6 rounded-xl bg-[#252525]">
-        <p class="text-sm text-gray-300 mb-3">Analyzing Your Track...</p>
-        <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-[#4D61FF] to-accent animate-progress rounded-full"></div>
-        </div>
-    </div>
-
+    <script>
+        // Auto-redirect to next step for demo purposes after 3 seconds
+        setTimeout(() => {
+            window.location.href = "{{ route('consumer.studio.track-mixing') }}";
+        }, 3000);
+    </script>
 @endsection

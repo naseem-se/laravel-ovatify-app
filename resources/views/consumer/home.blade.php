@@ -5,12 +5,12 @@
     {{-- Header --}}
     <div class="flex justify-between items-start mb-10">
         <div>
-            <h2 class="text-magenta text-5xl font-black mb-1">Hey!</h2>
-            <h1 class="text-6xl font-black text-white leading-tight">Explore content</h1>
+            <h2 class="text-magenta text-[24px] font-black uppercase tracking-tight leading-none">Hey!</h2>
+            <h1 class="text-white text-[64px] font-black tracking-tighter leading-tight mt-1">Explore content</h1>
         </div>
 
         <a href="{{ route('consumer.creator.dashboard') }}"
-            class="text-magenta text-sm font-black uppercase tracking-widest hover:brightness-110 transition-all mt-4">
+            class="text-magenta text-[14px] font-black uppercase tracking-widest hover:brightness-110 transition-all mt-6">
             Become a creator
         </a>
     </div>
@@ -36,7 +36,7 @@
         @foreach(['Beats', 'Vocals', 'Loops', 'Bundles', 'Presets', 'Samples'] as $item)
             <button
                 class="px-6 py-2.5 rounded-full text-xs font-bold transition
-                                                                    {{ $loop->first ? 'category-pill-magenta shadow-lg shadow-magenta/20' : 'bg-[#252525] border border-gray-700 text-gray-400 hover:border-magenta hover:text-magenta' }}">
+                                                                            {{ $loop->first ? 'category-pill-magenta shadow-lg shadow-magenta/20' : 'bg-[#252525] border border-gray-700 text-gray-400 hover:border-magenta hover:text-magenta' }}">
                 {{ $item }}
             </button>
         @endforeach
@@ -45,10 +45,10 @@
     {{-- Featured Drops --}}
     <h3 class="text-lg font-semibold mb-4">Featured Drops</h3>
 
-    <div class="grid grid-cols-4 gap-5 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         @for($i = 0; $i < 4; $i++)
-            <div class="rounded-xl overflow-hidden"
-                style="background: linear-gradient(135deg, rgba(30, 20, 50, 0.9) 0%, rgba(20, 10, 40, 0.95) 100%);">
+            <div onclick="window.location.href='{{ route('consumer.marketplace.track.details') }}'"
+                class="rounded-[32px] overflow-hidden bg-[#141414] border border-white/5 hover:border-white/10 transition-all group cursor-pointer">
                 {{-- Track Image with Waveform --}}
                 <div class="relative h-44 p-4 flex flex-col justify-between track-card-bg group">
                     {{-- Play Button --}}
@@ -69,18 +69,20 @@
                     </div>
                 </div>
 
-                {{-- Track Info --}}
-                <div class="p-4 bg-[#252525]">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h4 class="font-medium text-sm">Cloudside</h4>
-                            <p class="text-xs text-gray-500">R&B | Melancholic</p>
+                <div class="p-5 bg-transparent">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-white text-[16px]">Cloudside</h4>
+                            <p class="text-[10px] text-white/20 uppercase font-black tracking-widest">R&B | Melancholic</p>
                         </div>
-                        <span class="text-sm font-semibold">$19</span>
+                        <div class="bg-[#1A1A1A] px-3 py-1.5 rounded-lg border border-white/5">
+                            <span class="text-magenta font-black text-[12px] tracking-tight">$19</span>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <img src="https://i.pravatar.cc/24?img={{ $i }}" alt="Artist" class="w-5 h-5 rounded-full">
-                        <span class="text-xs text-gray-400">Luna Beats</span>
+                        <img src="https://ui-avatars.com/api/?name=Luna+Beats&background=4D61FF&color=fff" alt="Artist"
+                            class="w-5 h-5 rounded-full">
+                        <span class="text-[11px] font-bold text-white/40">Luna Beats</span>
                     </div>
                 </div>
             </div>
@@ -90,10 +92,10 @@
     {{-- Invest in Music Section --}}
     <h3 class="text-xl font-black mb-8">Invest in music</h3>
 
-    <div class="grid grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
         @for($i = 0; $i < 4; $i++)
-            <div
-                class="rounded-2xl overflow-hidden flex bg-[#16161C] border border-gray-800/50 hover:border-magenta/20 transition-all duration-300 group">
+            <div onclick="window.location.href='{{ route('consumer.investments.track.details') }}'"
+                class="rounded-[32px] overflow-hidden flex bg-[#141414] border border-white/5 hover:border-white/10 transition-all duration-300 group cursor-pointer">
                 {{-- Track Image --}}
                 <div class="w-40 h-40 flex-shrink-0 relative track-card-bg">
                     {{-- Play Button --}}

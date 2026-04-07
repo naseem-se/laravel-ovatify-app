@@ -1,91 +1,74 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20 relative">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Investment Settings</h1>
-    </div>
+        {{-- Top Navigation (Figma Match) --}}
+        <div class="flex items-center gap-6 pt-2 mb-2">
+            <a href="{{ url()->previous() }}" class="text-[#4D61FF] hover:opacity-80 transition-all">
+                <i class="fas fa-arrow-left text-[22px]"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-[34px] font-bold tracking-tight">Set Investment Terms</h1>
+        </div>
 
-    <div class="max-w-4xl mx-auto grid grid-cols-12 gap-8">
-        {{-- Left: Form --}}
-        <div class="col-span-8 space-y-6">
-            <div class="bg-[#252525] rounded-3xl p-8 shadow-2xl space-y-8">
-                {{-- Ownership Percentage --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-4">Percentage of ownership to share</label>
-                    <div class="flex items-center gap-6">
-                        <input type="range" min="1" max="100" value="10" class="flex-1 accent-accent">
-                        <div
-                            class="w-16 h-10 rounded-lg bg-[#1A1A1A] border border-gray-700 flex items-center justify-center font-bold text-accent">
-                            10%
-                        </div>
-                    </div>
+        <p class="text-white/40 text-[17px] font-medium mb-12">
+            Define pricing, ownership blocks, and revenue share details
+        </p>
+
+        {{-- Form Content (Figma Match) --}}
+        <div class="space-y-12 mb-16">
+            {{-- Cover Art Upload --}}
+            <div
+                class="relative w-full aspect-[2/1] bg-[#141414] border-2 border-dashed border-[#4D61FF]/20 rounded-[48px] flex flex-col items-center justify-center gap-4 group cursor-pointer hover:border-[#4D61FF]/40 transition-all">
+                <div
+                    class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-image text-white/30 text-2xl"></i>
                 </div>
-
-                <div class="grid grid-cols-2 gap-6">
-                    {{-- Number of Blocks --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-2">Number of Blocks</label>
-                        <input type="number" value="100"
-                            class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-                        <p class="text-[10px] text-gray-500 mt-2">Each block represents a fraction of the shared ownership.
-                        </p>
-                    </div>
-
-                    {{-- Price per Block --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-2">Price per Block ($)</label>
-                        <input type="number" value="5.00"
-                            class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-                    </div>
-                </div>
-
-                {{-- ROI Projection --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-2">Projected ROI (%)</label>
-                    <input type="text" placeholder="e.g. 5% - 15% annually"
-                        class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-                </div>
+                <p class="text-white/30 text-[17px] font-bold tracking-tight">Upload your cover art</p>
             </div>
 
-            <button
-                class="w-full py-5 rounded-2xl bg-accent text-white font-bold text-md hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] transition">
-                Enable Investment
+            {{-- Investment Grid (Figma Match) --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                <div class="space-y-4">
+                    <label class="text-white text-[16px] font-bold opacity-90 block">Total Track Valuation</label>
+                    <div class="bg-[#141414] rounded-2xl border border-white/[0.03] p-6">
+                        <input type="text" placeholder="Enter track valuation"
+                            class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-white text-[16px] font-bold opacity-90 block">Ownership block</label>
+                    <div class="bg-[#141414] rounded-2xl border border-white/[0.03] p-6">
+                        <input type="text" placeholder="e.g. 5%"
+                            class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-white text-[16px] font-bold opacity-90 block">Price per block</label>
+                    <div class="bg-[#141414] rounded-2xl border border-white/[0.03] p-6">
+                        <input type="text" placeholder="e.g. $5"
+                            class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-white text-[16px] font-bold opacity-90 block">Set max availability blocks</label>
+                    <div class="bg-[#141414] rounded-2xl border border-white/[0.03] p-6">
+                        <input type="text" placeholder="e.g. 20"
+                            class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-10">
+            <button onclick="window.location.href='{{ route('consumer.forms.success.investment') }}'"
+                class="w-full py-6 bg-[#4D61FF] text-white font-bold text-[20px] rounded-2xl shadow-xl shadow-[#4D61FF]/10 hover:bg-[#3D51EF] transition-all active:scale-[0.995]">
+                Publish for Investment
             </button>
         </div>
 
-        {{-- Right: Preview/Summary --}}
-        <div class="col-span-4 space-y-6">
-            <div class="bg-accent/5 border border-accent/20 rounded-3xl p-6 text-center">
-                <h3 class="text-sm font-bold text-accent mb-6">Investment Preview</h3>
-
-                <div
-                    class="w-32 h-32 mx-auto rounded-full border-4 border-accent border-t-transparent animate-[spin_10s_linear_infinite] mb-6 flex items-center justify-center">
-                    <div class="text-2xl font-bold">10%</div>
-                </div>
-
-                <div class="space-y-4 text-left">
-                    <div class="flex justify-between text-xs">
-                        <span class="text-gray-500">Total Value</span>
-                        <span class="font-bold text-white">$500.00</span>
-                    </div>
-                    <div class="flex justify-between text-xs">
-                        <span class="text-gray-500">Block Count</span>
-                        <span class="font-bold text-white">100</span>
-                    </div>
-                    <div class="flex justify-between text-xs">
-                        <span class="text-gray-500">Available</span>
-                        <span class="font-bold text-green-400">100%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
 @endsection

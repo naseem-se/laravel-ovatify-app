@@ -1,64 +1,64 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Upload Content</h1>
-    </div>
+        {{-- Top Navigation --}}
+        <div class="flex items-center gap-6 pt-2 mb-8">
+            <a href="{{ url()->previous() }}" class="text-[#4D61FF] hover:opacity-80 transition-all">
+                <i class="fas fa-arrow-left text-[22px]"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-[34px] font-bold tracking-tight">Create your session</h1>
+        </div>
 
-    {{-- Upload Dropzone --}}
-    <div class="max-w-3xl mx-auto">
-        <div
-            class="p-12 border-2 border-dashed border-gray-700 rounded-2xl bg-[#252525] flex flex-col items-center justify-center text-center mb-8 hover:border-accent transition group">
+        {{-- Minimal Step Indicator --}}
+        <div class="mb-12">
+            <div class="flex items-center gap-4 mb-4">
+                <span class="text-magenta font-black text-[14px] uppercase tracking-widest">Step 02</span>
+                <div class="h-[2px] w-24 bg-white/10 rounded-full relative overflow-hidden">
+                    <div class="absolute inset-0 bg-magenta w-2/4"></div>
+                </div>
+                <span class="text-white/40 font-bold text-[14px]">Cover Art</span>
+            </div>
+            <p class="text-white/40 text-[17px] font-medium max-w-[800px]">
+                Make your track stand out with a high-quality cover image. Recommended size: 1600x1600.
+            </p>
+        </div>
+
+        {{-- Upload Container --}}
+        <div class="space-y-12 max-w-[800px]">
             <div
-                class="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mb-6 group-hover:bg-accent/20 transition">
-                <svg class="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-bold mb-2">Select your file to upload</h2>
-            <p class="text-sm text-gray-500 mb-8 max-w-sm">Support for WAV, MP3, and AIFF. Maximum file size is 50MB.</p>
+                class="relative w-full aspect-square md:aspect-video rounded-[32px] border-2 border-dashed border-white/5 bg-[#141414] flex flex-col items-center justify-center gap-6 hover:border-[#4D61FF]/40 transition-all cursor-pointer group shadow-inner overflow-hidden">
 
-            <button
-                class="px-8 py-3 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition shadow-lg">
-                Choose File
-            </button>
-        </div>
-
-        {{-- Uploading State (List) --}}
-        <div class="space-y-4">
-            <h3 class="text-sm font-medium text-gray-400">Recently uploaded</h3>
-
-            <div class="p-4 rounded-xl bg-[#252525] flex items-center justify-between border border-gray-700">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-accent">
-                        <i class="fas fa-file-audio"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-medium">Summer_Mix_V1.wav</h4>
-                        <p class="text-[10px] text-gray-500">12.4 MB · Just now</p>
-                    </div>
+                <div
+                    class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center text-white/30 group-hover:text-white group-hover:bg-[#4D61FF]/20 transition-all">
+                    <i class="far fa-image text-4xl"></i>
                 </div>
-                <div class="flex items-center gap-10">
-                    <div class="w-48 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                        <div class="h-full bg-accent w-3/4 rounded-full animate-pulse"></div>
-                    </div>
-                    <button class="text-gray-500 hover:text-white transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+
+                <div class="text-center space-y-2">
+                    <p class="text-white text-[20px] font-bold">Upload your cover art</p>
+                    <p class="text-white/20 text-[14px] font-medium">Drag & drop or browse from your device</p>
+                </div>
+
+                {{-- Preview Backdrop Placeholder --}}
+                <div
+                    class="absolute inset-0 bg-[#4D61FF]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 </div>
             </div>
+
+            {{-- Actions --}}
+            <div class="grid grid-cols-2 gap-6">
+                <button onclick="window.history.back()"
+                    class="w-full py-5 bg-transparent border-2 border-white/5 text-white/40 font-bold text-[18px] rounded-2xl hover:bg-white/5 hover:text-white transition-all">
+                    Back
+                </button>
+                {{-- Skipping actual next route for now, assuming Step 3 is preview --}}
+                <button onclick="window.location.href='{{ route('consumer.studio.customize') }}'"
+                    class="w-full py-5 bg-[#4D61FF] text-white font-bold text-[18px] rounded-2xl hover:bg-[#3D51EF] transition-all shadow-xl shadow-blue-500/10 active:scale-[0.995]">
+                    Continue to Preview
+                </button>
+            </div>
         </div>
+
     </div>
-
 @endsection

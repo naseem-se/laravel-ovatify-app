@@ -1,112 +1,142 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20 relative" x-data="{ tab: 'standard' }">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Track Details</h1>
-    </div>
+        {{-- Top Section (Figma Match for Audio) --}}
+        <div class="flex flex-col md:flex-row gap-12 items-start mb-16 pt-4">
+            {{-- Image Thumbnail --}}
+            <div
+                class="w-full md:w-[400px] aspect-square rounded-[32px] overflow-hidden shadow-2xl border border-white/5 relative group">
+                <img src="{{ asset('images/login.png') }}"
+                    class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <button
+                        class="w-20 h-20 bg-magenta rounded-full flex items-center justify-center text-white shadow-3xl hover:scale-110 transition-transform">
+                        <i class="fas fa-play text-2xl ml-1"></i>
+                    </button>
+                </div>
+            </div>
 
-    {{-- Audio Player Section --}}
-    <div class="p-8 rounded-2xl bg-[#252525] mb-8 relative overflow-hidden">
-        {{-- Background Decoration --}}
-        <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
-
-        <div class="relative z-10">
-            <div class="flex items-center gap-8 mb-10">
-                <div class="w-40 h-40 rounded-2xl overflow-hidden shadow-2xl relative group">
-                    <img src="https://picsum.photos/400/400?random=2" class="w-full h-full object-cover">
-                    <div
-                        class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                        <button class="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center">
-                            <svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                        </button>
+            <div class="flex-1 space-y-10">
+                <div class="space-y-4">
+                    <h1 class="text-white text-[56px] font-black tracking-tighter leading-tight">Cloudside</h1>
+                    <div class="flex items-center gap-4">
+                        <img src="https://ui-avatars.com/api/?name=Luna+Beats&background=FF00FF&color=fff"
+                            class="w-14 h-14 rounded-full border-2 border-white/10">
+                        <div>
+                            <p class="text-white text-[20px] font-bold">Luna Beats</p>
+                            <a href="#"
+                                class="text-white/30 text-[14px] font-medium hover:text-magenta transition-colors">View
+                                Artist Profile</a>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <h2 class="text-3xl font-bold mb-2">Summer Melodies</h2>
-                    <div class="flex items-center gap-3 mb-6">
-                        <img src="https://i.pravatar.cc/32?img=12" class="w-8 h-8 rounded-full border border-accent">
-                        <span class="text-lg font-medium">Luna Beats</span>
+                {{-- Waveform (Figma Match) --}}
+                <div class="space-y-4">
+                    <div class="flex items-end gap-[4px] h-16 opacity-60">
+                        @for($i = 0; $i < 60; $i++)
+                            <div class="w-[3px] bg-magenta rounded-full" style="height: {{ rand(20, 100) }}%"></div>
+                        @endfor
                     </div>
-                    <div class="flex gap-4">
+                    <div class="flex justify-between text-white/30 font-bold text-[14px] tracking-widest">
+                        <span>00:00</span>
+                        <span>03:45</span>
+                    </div>
+                </div>
+
+                {{-- Metadata Grid (Figma Match for Audio) --}}
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/5 pt-8">
+                    <div class="space-y-2">
+                        <span class="text-magenta text-[12px] font-black uppercase tracking-widest opacity-60">Genre</span>
+                        <p class="text-white text-[18px] font-bold">R&B | Soul</p>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-magenta text-[12px] font-black uppercase tracking-widest opacity-60">BPM</span>
+                        <p class="text-white text-[18px] font-bold">95</p>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-magenta text-[12px] font-black uppercase tracking-widest opacity-60">Key</span>
+                        <p class="text-white text-[18px] font-bold">C Minor</p>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-magenta text-[12px] font-black uppercase tracking-widest opacity-60">Vibe</span>
+                        <p class="text-white text-[18px] font-bold">Melancholic</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- License & Pricing (Figma Match) --}}
+        <div class="bg-[#141414] rounded-[40px] border border-white/5 p-12 space-y-12 shadow-3xl">
+            <div class="flex justify-between items-center border-b border-white/5 pb-8">
+                <h3 class="text-white text-[32px] font-black tracking-tighter">License & Pricing</h3>
+                <div class="flex gap-16 pr-4">
+                    <button @click="tab = 'standard'"
+                        :class="tab === 'standard' ? 'text-white border-b-2 border-magenta' : 'text-white/30 border-b-2 border-transparent'"
+                        class="pb-4 text-[18px] font-bold transition-all uppercase tracking-widest">Standard</button>
+                    <button @click="tab = 'extended'"
+                        :class="tab === 'extended' ? 'text-white border-b-2 border-magenta' : 'text-white/30 border-b-2 border-transparent'"
+                        class="pb-4 text-[18px] font-bold transition-all uppercase tracking-widest">Extended</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {{-- License List --}}
+                <div class="space-y-8">
+                    <div class="bg-white/5 rounded-[32px] p-8 border border-white/10">
+                        <div class="flex justify-between items-center mb-8">
+                            <h4 class="text-white text-[24px] font-black uppercase tracking-tight">Standard License</h4>
+                            <span class="text-magenta text-[28px] font-black tracking-tight">$19</span>
+                        </div>
+                        <ul class="space-y-5">
+                            <li class="flex items-center gap-4 text-white/60 font-bold text-[16px]">
+                                <i class="fas fa-check text-magenta text-[12px]"></i> Digital Streaming (Spotify, Apple
+                                Music)
+                            </li>
+                            <li class="flex items-center gap-4 text-white/60 font-bold text-[16px]">
+                                <i class="fas fa-check text-magenta text-[12px]"></i> YouTube Monetization
+                            </li>
+                            <li class="flex items-center gap-4 text-white/60 font-bold text-[16px]">
+                                <i class="fas fa-check text-magenta text-[12px]"></i> Up to 500k Streams
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="window.location.href='{{ route('consumer.marketplace.checkout') }}'"
+                        class="w-full py-6 bg-magenta text-white font-black text-[20px] uppercase tracking-widest rounded-2xl shadow-xl shadow-magenta/10 hover:bg-magenta/90 transition-all active:scale-[0.99]">
+                        License Track
+                    </button>
+                </div>
+
+                {{-- FAQ/Legal Note (Figma Style) --}}
+                <div class="space-y-6 pt-2">
+                    <h4 class="text-white font-black text-[18px] uppercase tracking-widest opacity-60">Legal Information
+                    </h4>
+                    <p class="text-white/30 text-[15px] leading-relaxed font-bold">
+                        By licensing this track, you agree to the terms of the Ovatifiy Licensing Agreement.
+                        Ownership of the master remains with the creator, while you are granted use rights based on the
+                        selected license tier.
+                    </p>
+                    <div class="pt-4 flex flex-wrap gap-4">
                         <span
-                            class="px-3 py-1 rounded-full bg-gray-800 text-[10px] uppercase font-bold text-gray-400">Pop</span>
-                        <span class="px-3 py-1 rounded-full bg-gray-800 text-[10px] uppercase font-bold text-gray-400">120
-                            BPM</span>
-                        <span class="px-3 py-1 rounded-full bg-gray-800 text-[10px] uppercase font-bold text-gray-400">D
-                            Minor</span>
+                            class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-white/40 text-[12px] font-bold uppercase tracking-widest">Royalty-Free</span>
+                        <span
+                            class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-white/40 text-[12px] font-bold uppercase tracking-widest">Master
+                            Rights</span>
                     </div>
                 </div>
             </div>
-
-            {{-- Progress Slider --}}
-            <div class="space-y-2 mb-4">
-                <div class="relative h-2 bg-gray-800 rounded-full">
-                    <div class="absolute top-0 left-0 h-full bg-accent rounded-full" style="width: 45%"></div>
-                    <div
-                        class="absolute top-1/2 -translate-y-1/2 left-[45%] w-4 h-4 rounded-full bg-white shadow-lg border-2 border-accent">
-                    </div>
-                </div>
-                <div class="flex justify-between text-[10px] text-gray-500 font-mono">
-                    <span>01:12</span>
-                    <span>02:45</span>
-                </div>
-            </div>
-
-            {{-- Controls --}}
-            <div class="flex items-center justify-center gap-8">
-                <button class="text-gray-400 hover:text-white transition"><i class="fas fa-random"></i></button>
-                <button class="text-gray-400 hover:text-white transition"><i
-                        class="fas fa-step-backward text-xl"></i></button>
-                <button
-                    class="w-16 h-16 rounded-full bg-accent text-white flex items-center justify-center hover:scale-105 transition shadow-lg shadow-accent/20">
-                    <i class="fas fa-pause text-2xl"></i>
-                </button>
-                <button class="text-gray-400 hover:text-white transition"><i
-                        class="fas fa-step-forward text-xl"></i></button>
-                <button class="text-gray-400 hover:text-white transition"><i class="fas fa-redo"></i></button>
-            </div>
         </div>
+
+        {{-- Back Button --}}
+        <div class="pt-12">
+            <a href="{{ route('consumer.marketplace.index') }}"
+                class="flex items-center gap-3 text-white/40 hover:text-white transition-all font-bold group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                <span>Back to Marketplace</span>
+            </a>
+        </div>
+
     </div>
-
-    {{-- Purchase/Invest Options --}}
-    <div class="grid grid-cols-2 gap-6">
-        {{-- Marketplace License --}}
-        <div class="p-6 rounded-2xl bg-[#252525] border border-gray-700 hover:border-accent/40 transition">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h3 class="font-bold text-lg">Purchase License</h3>
-                    <p class="text-xs text-gray-500">Get 100% royalty free license</p>
-                </div>
-                <span class="text-2xl font-bold text-accent">$29</span>
-            </div>
-            <button class="w-full py-4 rounded-xl bg-accent text-white font-bold text-sm hover:opacity-90 transition">
-                Add to cart
-            </button>
-        </div>
-
-        {{-- Invest Option --}}
-        <div class="p-6 rounded-2xl bg-[#252525] border border-gray-700 hover:border-purple-400/40 transition">
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <h3 class="font-bold text-lg">Invest in royalties</h3>
-                    <p class="text-xs text-gray-500">Own share of streaming royalties</p>
-                </div>
-                <span class="text-2xl font-bold text-purple-400">10% Available</span>
-            </div>
-            <button class="w-full py-4 rounded-xl bg-purple-500 text-white font-bold text-sm hover:opacity-90 transition">
-                Invest Now
-            </button>
-        </div>
-    </div>
-
 @endsection

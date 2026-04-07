@@ -1,86 +1,93 @@
 @extends('layouts.app')
 
 @section('content')
-
-    {{-- Header --}}
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h2 class="text-accent text-xl font-medium">Explore</h2>
-            <h1 class="text-3xl font-bold">Your Marketplace</h1>
-        </div>
-    </div>
-
-    {{-- Search --}}
-    <div class="mb-6">
-        <div class="relative">
-            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input type="text" placeholder="Search images"
-                class="w-full bg-[#252525] rounded-lg pl-12 pr-5 py-3 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-accent">
-        </div>
-    </div>
-
-    {{-- Tabs --}}
-    <div class="grid grid-cols-2 mb-8 border-b border-gray-700">
-        <a href="{{ route('consumer.marketplace.index') }}"
-            class="p-4 flex justify-center items-center gap-2 text-sm transition border-b-2 cursor-pointer
-                {{ Request::routeIs('consumer.marketplace.index') ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-transparent text-gray-400 hover:text-gray-300' }}">
-            Tracks / Audios
-        </a>
-        <a href="{{ route('consumer.marketplace.images') }}"
-            class="p-4 flex justify-center items-center gap-2 text-sm transition border-b-2 cursor-pointer
-                {{ Request::routeIs('consumer.marketplace.images') ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-transparent text-gray-400 hover:text-gray-300' }}">
-            Images / Illustrations
-        </a>
-    </div>
-
-    {{-- Category Filters --}}
-    <div class="flex gap-3 mb-8 flex-wrap">
-        @foreach(['Logos', 'Album Art', 'Social Media', 'Marketing', 'Illustrations', 'Backgrounds'] as $i => $item)
-            <button
-                class="px-5 py-2 rounded-full text-xs font-medium transition
-                            {{ $i === 0 ? 'bg-[#4D61FF] text-white' : 'border border-gray-600 text-gray-400 hover:border-accent hover:text-accent' }}">
-                {{ $item }}
-            </button>
-        @endforeach
-    </div>
-
-    {{-- Images Grid --}}
-    <div class="grid grid-cols-4 gap-6">
-        @for($i = 0; $i < 8; $i++)
-            <div
-                class="rounded-2xl overflow-hidden bg-[#252525] group border border-gray-800 hover:border-accent/40 transition shadow-lg">
-                <div class="aspect-square relative overflow-hidden">
-                    <img src="https://picsum.photos/400/400?random={{ $i + 100 }}"
-                        class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <div
-                        class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
-                        <a href="{{ route('consumer.marketplace.image.details') }}"
-                            class="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center hover:scale-110 transition shadow-lg">
-                            <i class="fas fa-eye text-sm"></i>
-                        </a>
-                        <button
-                            class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:scale-110 transition">
-                            <i class="fas fa-shopping-cart text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="p-4">
-                    <div class="flex justify-between items-start mb-1">
-                        <h4 class="text-sm font-bold truncate pr-4 text-white">Neon Dream #{{ $i + 1 }}</h4>
-                        <span class="text-accent font-bold text-sm">$25</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <img src="https://i.pravatar.cc/24?img={{ $i + 20 }}"
-                            class="w-5 h-5 rounded-full border border-gray-700">
-                        <span class="text-[10px] text-gray-400">Designer {{ $i + 1 }}</span>
-                    </div>
-                </div>
+    <div class="max-w-[1200px] mx-auto pb-20">
+        <div class="space-y-12">
+            {{-- Header Section (Figma Flat Match) --}}
+            <div class="space-y-0 pl-4">
+                <h1 class="text-magenta text-[32px] font-black uppercase tracking-tight leading-none">EXPLORE</h1>
+                <h2 class="text-white text-[64px] font-black tracking-tighter leading-tight mt-1">Your Marketplace</h2>
             </div>
-        @endfor
-    </div>
 
+            {{-- Search Bar (Figma Flat Match) --}}
+            <div class="relative max-w-[800px] pl-4">
+                <div class="absolute inset-y-0 left-10 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-[#4D61FF] text-xl"></i>
+                </div>
+                <input type="text" placeholder="Search song"
+                    class="w-full bg-[#141414] border border-white/5 rounded-2xl py-6 pl-16 pr-8 text-white text-[18px] font-medium focus:outline-none focus:border-[#4D61FF]/40 transition-all placeholder:text-white/20">
+            </div>
+
+            {{-- Tab Navigation (Figma Flat Match) --}}
+            <div class="flex gap-12 border-b border-white/5 pb-0 pl-4">
+                <a href="{{ route('consumer.marketplace.index') }}"
+                    class="pb-5 text-[18px] font-black uppercase tracking-widest transition-all {{ Route::is('consumer.marketplace.index') ? 'text-white border-b-4 border-magenta' : 'text-white/20 border-b-4 border-transparent hover:text-white/40' }}">
+                    Tracks/Audios
+                </a>
+                <a href="{{ route('consumer.marketplace.images') }}"
+                    class="pb-5 text-[18px] font-black uppercase tracking-widest transition-all {{ Route::is('consumer.marketplace.images') ? 'text-white border-b-4 border-magenta' : 'text-white/20 border-b-4 border-transparent hover:text-white/40' }}">
+                    Images/Illustrations
+                </a>
+            </div>
+        </div>
+
+        {{-- Trending now --}}
+        <div class="space-y-10 mb-20">
+            <div class="flex justify-between items-center">
+                <h3 class="text-white text-[28px] font-bold">Trending now</h3>
+                <a href="#" class="text-[#4D61FF] text-sm font-bold hover:underline">View all</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @for($i = 0; $i < 4; $i++)
+                    <div onclick="window.location.href='{{ route('consumer.marketplace.image.details') }}'"
+                        class="bg-[#141414] p-4 rounded-[32px] space-y-4 hover:bg-[#1A1A1A] transition-all group cursor-pointer border border-white/[0.03] shadow-xl">
+                        <div class="relative aspect-square rounded-[24px] overflow-hidden">
+                            <img src="https://picsum.photos/400/400?random={{ $i + 600 }}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="space-y-4 px-2 pb-2">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-white text-[17px] font-bold tracking-tight">Lorem Ipsum</h4>
+                                <span class="text-white font-bold text-[16px]">$20</span>
+                            </div>
+                            <div class="text-[11px] text-white/30 font-medium space-y-1">
+                                <p>1600x1600</p>
+                                <p>Standard License</p>
+                            </div>
+                        </div>
+                    </div>
+                @endfor
+            </div>
+        </div>
+
+        {{-- Recommended for you --}}
+        <div class="space-y-10">
+            <div class="flex justify-between items-center">
+                <h3 class="text-white text-[28px] font-bold">Recommended for you</h3>
+                <a href="#" class="text-[#4D61FF] text-sm font-bold hover:underline">View all</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @for($i = 0; $i < 4; $i++)
+                    <div onclick="window.location.href='{{ route('consumer.marketplace.image.details') }}'"
+                        class="bg-[#141414] p-4 rounded-[32px] space-y-4 hover:bg-[#1A1A1A] transition-all group cursor-pointer border border-white/[0.03] shadow-xl">
+                        <div class="relative aspect-square rounded-[24px] overflow-hidden">
+                            <img src="https://picsum.photos/400/400?random={{ $i + 700 }}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="space-y-4 px-2 pb-2">
+                            <div class="flex justify-between items-start">
+                                <h4 class="text-white text-[17px] font-bold tracking-tight">Lorem Ipsum</h4>
+                                <span class="text-white font-bold text-[16px]">$20</span>
+                            </div>
+                            <div class="text-[11px] text-white/30 font-medium space-y-1">
+                                <p>1600x1600</p>
+                                <p>Standard License</p>
+                            </div>
+                        </div>
+                    </div>
+                @endfor
+            </div>
+        </div>
+
+    </div>
 @endsection

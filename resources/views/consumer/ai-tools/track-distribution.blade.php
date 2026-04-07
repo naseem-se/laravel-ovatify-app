@@ -1,101 +1,105 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1000px] mx-auto pb-20 relative" x-data="{ state: 'default' }">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Track Distribution</h1>
-    </div>
+        {{-- Top Navigation --}}
+        <div class="flex items-center gap-4 pt-4 mb-10">
+            <a href="{{ route('consumer.creator.dashboard') }}" class="text-[#4D61FF] hover:opacity-80 transition-opacity">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-3xl font-bold">Distribute Your Track</h1>
+        </div>
 
-    {{-- Track Result Card --}}
-    <div class="p-6 rounded-xl bg-[#252525] mb-8">
-        <div class="flex items-center gap-6 mb-8">
-            {{-- CD / Vinyl Style Representation --}}
-            <div class="w-32 h-32 relative flex-shrink-0">
-                <div
-                    class="w-full h-full rounded-full border-4 border-gray-800 bg-gradient-to-br from-[#1A1A1A] to-[#333] flex items-center justify-center shadow-2xl relative overflow-hidden">
-                    <div class="absolute inset-0 bg-accent bg-opacity-10 animate-pulse"></div>
-                    <div class="w-8 h-8 rounded-full bg-white opacity-10"></div>
-                    <img src="https://i.pravatar.cc/128?img=5"
-                        class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay">
-                </div>
-                {{-- Album Cover Decoration --}}
-                <div
-                    class="absolute -bottom-2 -right-2 w-12 h-12 rounded bg-accent/20 flex items-center justify-center border border-accent/30 backdrop-blur-sm">
-                    <svg class="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                    </svg>
-                </div>
-            </div>
-
-            <div>
-                <h2 class="text-xl font-bold mb-1">Reflection</h2>
-                <p class="text-sm text-gray-500 mb-4">Luna Beats · Pop · 02:45</p>
-
-                <div class="flex gap-4">
-                    {{-- Distribution Platforms --}}
-                    <div
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 text-green-400 text-xs border border-green-500/20">
-                        <i class="fab fa-spotify"></i>
-                        Spotify
-                    </div>
-                    <div
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 text-xs border border-red-500/20">
-                        <i class="fab fa-apple"></i>
-                        Apple Music
-                    </div>
-                    <div
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs border border-blue-500/20">
-                        <i class="fab fa-amazon"></i>
-                        Amazon Music
-                    </div>
-                </div>
+        <div class="space-y-6">
+            <h3 class="text-white text-xl font-bold">Choose Track</h3>
+            <div class="flex items-center gap-8 overflow-x-auto pb-4">
+                @foreach(['Lorem', 'Lorem', 'Ipsum', 'Ipsum', 'Ipsum'] as $index => $label)
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <div class="relative flex items-center justify-center">
+                            <input type="radio" name="track" value="{{ $index }}" class="peer hidden" {{ $index === 0 ? 'checked' : '' }}>
+                            <div
+                                class="w-6 h-6 border-2 border-[#4D61FF] rounded-full peer-checked:bg-transparent transition-all">
+                            </div>
+                            <div
+                                class="absolute w-3 h-3 bg-[#4D61FF] rounded-full opacity-0 peer-checked:opacity-100 transition-opacity">
+                            </div>
+                        </div>
+                        <span
+                            class="text-white text-lg font-medium group-hover:text-[#4D61FF] transition-colors">{{ $label }}</span>
+                    </label>
+                @endforeach
             </div>
         </div>
 
-        {{-- Status Steps --}}
-        <div class="space-y-4">
-            <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
+        <div class="my-10">
+            <div
+                class="w-full aspect-[2/1] bg-[#1A1A1A] border-2 border-dashed border-[#4D61FF]/30 rounded-[32px] flex flex-col items-center justify-center gap-6 group cursor-pointer hover:bg-white/5 transition-all">
+                <div
+                    class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="far fa-image text-white/50 text-3xl"></i>
                 </div>
-                <span class="text-sm text-gray-300 font-medium">Metadata validation complete</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-accent flex items-center justify-center animate-pulse">
-                    <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
-                </div>
-                <span class="text-sm text-white font-medium">Submitting to stores...</span>
-            </div>
-            <div class="flex items-center gap-3 opacity-40">
-                <div class="w-5 h-5 rounded-full bg-gray-600 flex items-center justify-center"></div>
-                <span class="text-sm text-gray-400">Review (estimated 48-72h)</span>
+                <span class="text-white/60 text-xl">Upload your audio track</span>
             </div>
         </div>
-    </div>
 
-    {{-- Confirmation Section --}}
-    <div class="p-6 rounded-xl bg-accent/5 border border-accent/20 text-center">
-        <h3 class="text-sm font-semibold mb-2">Track distributed successfully!</h3>
-        <p class="text-xs text-gray-400 mb-6 max-w-sm mx-auto">Your track is now being processed and will be available on
-            all major streaming platforms shortly.</p>
+        <div class="grid grid-cols-2 gap-6 mb-12">
+            <input type="text" placeholder="Enter Release title"
+                class="bg-[#1A1A1A]/80 border border-white/5 rounded-2xl py-6 px-8 text-white text-lg focus:outline-none focus:border-[#4D61FF] placeholder-white/20">
+            <input type="text" placeholder="Enter Artist Name"
+                class="bg-[#1A1A1A]/80 border border-white/5 rounded-2xl py-6 px-8 text-white text-lg focus:outline-none focus:border-[#4D61FF] placeholder-white/20">
+            <input type="text" placeholder="Enter Release Date"
+                class="bg-[#1A1A1A]/80 border border-white/5 rounded-2xl py-6 px-8 text-white text-lg focus:outline-none focus:border-[#4D61FF] placeholder-white/20">
+            <input type="text" placeholder="Enter ISRC Code"
+                class="bg-[#1A1A1A]/80 border border-white/5 rounded-2xl py-6 px-8 text-white text-lg focus:outline-none focus:border-[#4D61FF] placeholder-white/20">
+        </div>
 
-        <div class="flex gap-4">
-            <button class="flex-1 py-3 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition">
-                View on QmeMarketplace
-            </button>
-            <button
-                class="flex-1 py-3 rounded-lg bg-[#252525] border border-gray-600 text-white text-sm font-medium hover:bg-[#303030] transition">
-                Home
+        <div class="pt-10">
+            <button @click="state = 'success'"
+                class="w-full py-6 bg-transparent border-2 border-white/10 text-white font-bold text-xl rounded-2xl hover:bg-white/5 transition-all">
+                Distribute now
             </button>
         </div>
-    </div>
 
+        {{-- SUCCESS MODAL --}}
+        <template x-if="state === 'success'">
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+                {{-- Overlay --}}
+                <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+                {{-- Modal --}}
+                <div
+                    class="relative bg-[#1A1A1A] border border-gray-800 rounded-[40px] w-full max-w-lg p-12 shadow-2xl text-center">
+                    {{-- Decorative Circles --}}
+                    <div class="absolute top-10 left-20 w-4 h-4 rounded-full bg-magenta"></div>
+                    <div class="absolute top-40 right-10 w-3 h-3 rounded-full bg-blue-500 blur-[2px]"></div>
+
+                    {{-- Icon Container --}}
+                    <div class="relative inline-block mb-10">
+                        <div
+                            class="w-32 h-32 rounded-full bg-magenta flex items-center justify-center shadow-[0_0_50px_rgba(214,0,214,0.4)]">
+                            <i class="fas fa-shield-alt text-white text-5xl"></i>
+                        </div>
+                    </div>
+
+                    <h2 class="text-white text-4xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-gray-500 text-xl font-medium mb-12">Your Track has been distributed!</p>
+
+                    <div class="flex justify-center gap-2">
+                        @for($i = 0; $i < 5; $i++)
+                            <div class="w-3 h-3 rounded-full bg-magenta/{{ 100 - ($i * 20) }}"></div>
+                        @endfor
+                    </div>
+
+                    <div class="mt-12">
+                        <button onclick="window.location.href='{{ route('consumer.forms.success.track-ready') }}'"
+                            class="w-full py-5 bg-[#4D61FF] text-white font-bold text-xl rounded-2xl shadow-lg hover:bg-[#3D51EF] transition-all">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </div>
 @endsection

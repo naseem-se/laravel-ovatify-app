@@ -1,95 +1,64 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20 relative">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Set for Sale</h1>
-    </div>
+        {{-- Top Navigation (Figma Match) --}}
+        <div class="flex items-center gap-6 pt-2 mb-2">
+            <a href="{{ url()->previous() }}" class="text-[#4D61FF] hover:opacity-80 transition-all">
+                <i class="fas fa-arrow-left text-[22px]"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-[34px] font-bold tracking-tight">Set up for digital purchase</h1>
+        </div>
 
-    {{-- Form Container --}}
-    <div class="max-w-3xl mx-auto bg-[#252525] rounded-3xl p-10 shadow-2xl">
-        <div class="space-y-8">
-            {{-- Track Selection --}}
-            <div>
-                <label class="block text-sm font-medium text-gray-400 mb-3">Target Content</label>
-                <div class="p-4 rounded-xl bg-[#1A1A1A] border border-gray-700 flex items-center gap-4">
-                    <img src="https://picsum.photos/64/64" class="w-12 h-12 rounded-lg">
-                    <div>
-                        <h4 class="text-sm font-bold">Midnight Reflection</h4>
-                        <p class="text-[10px] text-gray-500">Draft · 02:45</p>
-                    </div>
+        <p class="text-white/40 text-[17px] font-medium mb-12">
+            Add details to make your track available for sale
+        </p>
+
+        {{-- Form Content (Figma Match) --}}
+        <div class="space-y-12">
+            {{-- Cover Art Upload --}}
+            <div
+                class="relative w-full aspect-[2/1] bg-[#141414] border-2 border-dashed border-[#4D61FF]/20 rounded-[48px] flex flex-col items-center justify-center gap-4 group cursor-pointer hover:border-[#4D61FF]/40 transition-all">
+                <div
+                    class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-image text-white/30 text-2xl"></i>
                 </div>
+                <p class="text-white/30 text-[17px] font-bold tracking-tight">Upload your cover art</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
-                {{-- Price --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-2">Sale Price ($)</label>
-                    <input type="number" placeholder="e.g. 19.99"
-                        class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-                </div>
-
-                {{-- Category --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-2">Category</label>
-                    <select
-                        class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-                        <option>Beat</option>
-                        <option>Vocal</option>
-                        <option>Loop</option>
-                        <option>Bundle</option>
-                    </select>
-                </div>
-            </div>
-
-            {{-- Tags --}}
-            <div>
-                <label class="block text-sm font-medium text-gray-400 mb-2">Tags (comma separated)</label>
-                <input type="text" placeholder="e.g. summer, hiphop, chill"
-                    class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-            </div>
-
-            {{-- Visibility --}}
-            <div>
-                <label class="block text-sm font-medium text-gray-400 mb-3">Marketplace Visibility</label>
+            {{-- Price Details --}}
+            <div class="space-y-6">
+                <label class="text-white text-[18px] font-bold opacity-90 block">Track Price</label>
                 <div class="flex gap-4">
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="visibility" class="hidden peer" checked>
-                        <div
-                            class="p-4 rounded-xl border border-gray-700 bg-[#1A1A1A] text-center peer-checked:border-accent peer-checked:bg-accent/5 transition">
-                            <span class="text-xs font-medium">Public</span>
-                        </div>
-                    </label>
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="visibility" class="hidden peer">
-                        <div
-                            class="p-4 rounded-xl border border-gray-700 bg-[#1A1A1A] text-center peer-checked:border-accent peer-checked:bg-accent/5 transition">
-                            <span class="text-xs font-medium">Draft</span>
-                        </div>
-                    </label>
+                    <div class="flex-1 bg-[#141414] rounded-2xl border border-white/[0.03] p-6 flex items-center">
+                        <input type="text" placeholder="Price your Track"
+                            class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
+                    </div>
+                    <button
+                        class="px-8 bg-[#4D61FF] text-white font-bold text-[15px] rounded-2xl hover:bg-[#3D51EF] transition-all">
+                        Set
+                    </button>
                 </div>
             </div>
 
-            {{-- Agreements --}}
-            <div class="flex items-center gap-3 p-4 rounded-xl bg-accent/5 border border-accent/20">
-                <input type="checkbox" class="w-4 h-4 rounded accent-accent">
-                <span class="text-xs text-gray-400 leading-relaxed">I agree to the <a href="#"
-                        class="text-accent hover:underline">Marketplace Terms & Conditions</a> and confirm I own the rights
-                    to this content.</span>
+            {{-- Preview Duration --}}
+            <div class="space-y-6">
+                <label class="text-white text-[18px] font-bold opacity-90 block">Preview Duration</label>
+                <div class="grid grid-cols-4 gap-6">
+                    @for($i = 0; $i < 4; $i++)
+                        <div class="h-8 bg-[#141414] border border-white/[0.03] rounded-full"></div>
+                    @endfor
+                </div>
             </div>
+        </div>
 
-            {{-- Submit --}}
-            <button
-                class="w-full py-5 rounded-2xl bg-accent text-white font-bold text-md hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] transition">
-                Finalize Listing
+        <div class="pt-20">
+            <button onclick="window.location.href='{{ route('consumer.forms.success.sale') }}'"
+                class="w-full py-6 bg-[#4D61FF] text-white font-bold text-[20px] rounded-2xl shadow-xl shadow-[#4D61FF]/10 hover:bg-[#3D51EF] transition-all active:scale-[0.995]">
+                Publish for sale
             </button>
         </div>
-    </div>
 
+    </div>
 @endsection

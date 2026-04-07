@@ -1,63 +1,72 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="space-y-12 pb-20">
+        {{-- Header Section (Figma Flat Match) --}}
+        <div class="space-y-0">
+            <h1 class="text-magenta text-[32px] font-black uppercase tracking-tight leading-none">EXPLORE</h1>
+            <h2 class="text-white text-[64px] font-black tracking-tighter leading-tight mt-1">Your Tracks</h2>
+        </div>
 
-    {{-- Header --}}
-    <div class="flex justify-between items-center mb-16">
-        <div>
-            <h2 class="text-accent text-sm font-bold uppercase tracking-widest mb-2">My Library</h2>
-            <h1 class="text-5xl font-black">Your Tracks</h1>
+        {{-- Tab Navigation (Figma Flat Match) --}}
+        <div class="flex gap-12 border-b border-white/5 pb-0">
+            <button
+                class="pb-5 text-[18px] font-black uppercase tracking-widest transition-all text-white border-b-4 border-magenta">
+                My Published Tracks
+            </button>
+            <button
+                class="pb-5 text-[18px] font-black uppercase tracking-widest transition-all text-white/20 border-b-4 border-transparent hover:text-white/40">
+                My Creations with AI
+            </button>
+        </div>
+
+        {{-- Tracks List (Figma Flat Match) --}}
+        <div class="space-y-6">
+            @for ($i = 0; $i < 3; $i++)
+                <div
+                    class="bg-[#141414] border border-white/5 rounded-[32px] p-4 flex items-center gap-6 hover:bg-[#1A1A1A] transition-all group cursor-pointer">
+                    {{-- Track Art --}}
+                    <div class="relative w-32 h-32 rounded-[24px] overflow-hidden flex-shrink-0">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop"
+                            class="w-full h-full object-cover opacity-60" alt="Cover">
+                        <div class="absolute bottom-3 right-3">
+                            <div class="w-8 h-8 bg-magenta rounded-full flex items-center justify-center text-white shadow-lg">
+                                <i class="fas fa-play text-[8px] ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Track Info --}}
+                    <div class="flex-1 space-y-1">
+                        <h4 class="text-white text-[18px] font-black leading-tight">Family memories</h4>
+                        <p class="text-white/20 text-[11px] font-bold uppercase tracking-widest leading-none">Pop R&B | Warm
+                            happy</p>
+                        <div class="pt-3">
+                            <span
+                                class="text-magenta text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-magenta/10 rounded-lg border border-magenta/20">Draft</span>
+                        </div>
+                    </div>
+
+                    {{-- Waveform Visualizer (Standardized) --}}
+                    <div class="hidden md:flex flex-1 justify-end pr-10">
+                        <div class="flex items-end gap-[3px] h-10 opacity-20 w-48">
+                            @for($j = 0; $j < 30; $j++)
+                                <div class="w-[2px] bg-[#4D61FF] rounded-full" style="height: {{ rand(20, 100) }}%"></div>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+            @endfor
+        </div>
+
+        {{-- Bottom Action (Figma Match) --}}
+        <div class="pt-6">
+            <button
+                class="w-full py-5 bg-transparent border border-white/10 text-white/60 font-black text-[16px] uppercase tracking-widest rounded-2xl hover:bg-white/5 transition-all outline-none">
+                List your track on QmeMarketplace
+            </button>
         </div>
     </div>
 
-    {{-- Tabs --}}
-    <div class="flex gap-8 mb-8 border-b border-gray-700">
-        <button class="pb-3 text-sm font-medium border-b-2 border-accent text-accent">
-            My Published Tracks
-        </button>
-        <button class="pb-3 text-sm font-medium text-gray-400 hover:text-white">
-            My Creations with AI
-        </button>
     </div>
-
-    {{-- Tracks List --}}
-    <div class="space-y-4 mb-8">
-        @for($i = 0; $i < 3; $i++)
-            <div class="flex items-center gap-4 p-4 rounded-xl bg-[#252525]">
-                {{-- Track Image --}}
-                <div class="w-20 h-20 rounded-lg flex-shrink-0 relative"
-                    style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.3) 0%, rgba(75, 0, 130, 0.4) 50%, rgba(25, 25, 112, 0.3) 100%);">
-                    {{-- Play Button --}}
-                    <button
-                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-black/50">
-                        <svg class="w-3 h-3 text-accent ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                        </svg>
-                    </button>
-                </div>
-
-                {{-- Track Info --}}
-                <div class="flex-1">
-                    <h4 class="font-medium text-sm">Family memories</h4>
-                    <p class="text-xs text-gray-500">Pop R&B | Warm happy</p>
-                    <span class="inline-block mt-2 text-xs bg-accent/20 text-accent px-2 py-0.5 rounded">
-                        Draft
-                    </span>
-                </div>
-
-                {{-- Waveform --}}
-                <div class="flex-1 flex items-center justify-center gap-0.5 h-8">
-                    @foreach([20, 35, 25, 45, 20, 32, 40, 28, 38, 20, 30, 42, 25, 35, 28, 40, 22, 34, 38, 20, 35, 25, 45, 20, 32, 40, 28, 38] as $h)
-                        <div class="w-1 rounded-full bg-gray-600" style="height: {{ $h }}px;"></div>
-                    @endforeach
-                </div>
-            </div>
-        @endfor
-    </div>
-
-    {{-- List on Marketplace Button --}}
-    <button class="w-full py-4 rounded-lg bg-[#252525] text-white text-sm font-medium hover:bg-[#303030] transition">
-        List your track on QmeMarketplace
-    </button>
-
 @endsection

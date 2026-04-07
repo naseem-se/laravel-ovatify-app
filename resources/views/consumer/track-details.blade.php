@@ -1,163 +1,140 @@
 @extends('layouts.app')
 
-<style>
-    .wave-bar {
-        width: 3px;
-        background: rgba(139, 92, 246, 0.25);
-        border-radius: 2px;
-        transition: height 0.1s ease, background-color 0.1s ease;
-        pointer-events: none;
-        min-height: 4px;
-    }
-
-    .wave-bar.active {
-        background: linear-gradient(to top, #8B5CF6, #22D3EE);
-    }
-
-    .progress-slider {
-        appearance: none;
-        width: 100%;
-        height: 4px;
-        background: rgba(139, 92, 246, 0.2);
-        border-radius: 2px;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .progress-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-    }
-
-    .progress-slider::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-    }
-
-    .progress-slider::-moz-range-track {
-        background: none;
-        border: none;
-    }
-
-    .volume-slider {
-        appearance: none;
-        width: 100px;
-        height: 4px;
-        background: rgba(139, 92, 246, 0.2);
-        border-radius: 2px;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 10px;
-        height: 10px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-
-    .volume-slider::-moz-range-thumb {
-        width: 10px;
-        height: 10px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-    }
-
-    .control-btn {
-        transition: all 0.2s ease;
-    }
-
-    .control-btn:hover {
-        transform: scale(1.05);
-    }
-
-    .control-btn:active {
-        transform: scale(0.95);
-    }
-</style>
-
 @section('content')
-    {{-- Header --}}
-    <div class="card border border-gray-700 rounded-lg p-6">
-        <div class="card-header flex justify-between items-center mb-8">
-            <p class="text-accent text-xl font-medium">
-                <a href="{{ route('consumer.dashboard.index') }}"><i class="fa-solid fa-arrow-left"></i></a>
-                View Track Details
-            </p>
+    <div class="max-w-[1140px] mx-auto pb-20 relative">
+
+        {{-- Top Section (Figma Match for Audio) --}}
+        <div class="flex flex-col md:flex-row gap-12 items-start mb-16 pt-4">
+            {{-- Image Thumbnail --}}
+            <div
+                class="w-full md:w-[400px] aspect-square rounded-[32px] overflow-hidden shadow-2xl border border-white/5 relative group">
+                <img src="{{ asset('images/login.png') }}"
+                    class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <button
+                        class="w-20 h-20 bg-magenta rounded-full flex items-center justify-center text-white shadow-3xl hover:scale-110 transition-transform">
+                        <i class="fas fa-play text-2xl ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 space-y-10">
+                <div class="space-y-4">
+                    <h1 class="text-white text-[56px] font-black tracking-tighter leading-tight">Summer Vibes</h1>
+                    <div class="flex items-center gap-4">
+                        <img src="https://ui-avatars.com/api/?name=Luna+Beats&background=4D61FF&color=fff"
+                            class="w-14 h-14 rounded-full border-2 border-white/10">
+                        <div>
+                            <p class="text-white text-[20px] font-bold">Luna Beats</p>
+                            <a href="#"
+                                class="text-white/30 text-[14px] font-medium hover:text-[#4D61FF] transition-colors">View
+                                Artist Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Waveform (Figma Match) --}}
+                <div class="space-y-4">
+                    <div class="flex items-end gap-[4px] h-16 opacity-60">
+                        @for($i = 0; $i < 60; $i++)
+                            <div class="w-[3px] bg-[#4D61FF] rounded-full" style="height: {{ rand(20, 100) }}%"></div>
+                        @endfor
+                    </div>
+                    <div class="flex justify-between text-white/30 font-bold text-[14px] tracking-widest">
+                        <span>00:00</span>
+                        <span>03:45</span>
+                    </div>
+                </div>
+
+                {{-- Metadata Grid (Figma Match for Audio) --}}
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/5 pt-8">
+                    <div class="space-y-2">
+                        <span
+                            class="text-[#4D61FF] text-[12px] font-black uppercase tracking-widest opacity-60">Genre</span>
+                        <p class="text-white text-[18px] font-bold">R&B | Soul</p>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-[#4D61FF] text-[12px] font-black uppercase tracking-widest opacity-60">BPM</span>
+                        <p class="text-white text-[18px] font-bold">95</p>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-[#4D61FF] text-[12px] font-black uppercase tracking-widest opacity-60">Key</span>
+                        <p class="text-white text-[18px] font-bold">C Minor</p>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-[#4D61FF] text-[12px] font-black uppercase tracking-widest opacity-60">Vibe</span>
+                        <p class="text-white text-[18px] font-bold">Melancholic</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="card-body space-y-6 border-t border-gray-700 p-4">
-
-            <!-- ========== Creator Section ========== -->
-            <section class="flex items-center gap-4">
-                <img src="https://i.pravatar.cc/100" alt="Creator Avatar"
-                    class="w-14 h-14 rounded-full border border-white/10" />
-                <div>
-                    <h2 class="text-lg font-semibold">John Smith</h2>
-                    <p class="text-sm text-mutedText">POP Music Expert</p>
+        {{-- Investment Control (Figma Style) --}}
+        <div class="bg-[#141414] rounded-[48px] border border-white/5 p-12 space-y-12 shadow-3xl">
+            <div class="flex justify-between items-center border-b border-white/5 pb-8">
+                <h3 class="text-white text-[32px] font-black tracking-tighter">Invest in Blocks</h3>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-white/20 text-[12px] font-black uppercase tracking-widest">Available Blocks</p>
+                        <p class="text-white text-[18px] font-bold">75 / 100</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/5 mx-2"></div>
+                    <div class="text-right">
+                        <p class="text-white/20 text-[12px] font-black uppercase tracking-widest">Price per Block</p>
+                        <p class="text-magenta text-[20px] font-black">$120</p>
+                    </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- ================= Audio Player ================= -->
-            <x-audio link="{{ asset('images/audio.mp3') }}" />
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-8">
+                    <p class="text-white/40 font-bold text-[16px] leading-relaxed">
+                        Select the number of blocks you wish to invest in. Each block represents a 0.5% ownership stake in
+                        the master rights of this track.
+                    </p>
 
-            <!-- ========== Description Section ========== -->
-            <section class="space-y-2">
-                <h3 class="text-lg font-semibold">Description</h3>
-                <p class="text-sm text-mutedText leading-relaxed">
-                    This AI-generated track blends smooth Lo-fi beats with modern pop textures.
-                    Designed for relaxation, productivity, and ambient listening.
-                </p>
-            </section>
-
-            <!-- ========== Metadata Section ========== -->
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-cardBg rounded-xl p-6 border border-gray-700/50">
-                <div class="text-left">
-                    <h4 class="text-2xl font-semibold">100</h4>
-                    <p class="text-sm text-gray-300">Total Blocks</p>
+                    <div class="flex items-center gap-8 bg-white/5 rounded-[32px] p-6 border border-white/10 w-fit">
+                        <button
+                            class="w-14 h-14 rounded-2xl bg-[#1A1A1A] text-white/40 flex items-center justify-center border border-white/5 hover:bg-white/10 hover:text-white transition-all">
+                            <i class="fas fa-minus text-base"></i>
+                        </button>
+                        <span class="text-white font-black text-[42px] min-w-[80px] text-center tracking-tighter">01</span>
+                        <button
+                            class="w-14 h-14 rounded-2xl bg-[#4D61FF] text-white flex items-center justify-center hover:bg-[#3D51EF] transition-all shadow-xl shadow-[#4D61FF]/20 active:scale-95">
+                            <i class="fas fa-plus text-base"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="text-left">
-                    <h4 class="text-2xl font-semibold">20</h4>
-                    <p class="text-sm text-gray-300">Remaining Blocks</p>
+
+                <div class="space-y-6">
+                    <div class="bg-white/5 rounded-[32px] p-8 border border-white/10 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-white/40 font-bold uppercase tracking-widest text-[13px]">Total
+                                Ownership</span>
+                            <span class="text-white font-black text-[20px]">0.5%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-white/40 font-bold uppercase tracking-widest text-[13px]">Total
+                                Investment</span>
+                            <span class="text-magenta font-black text-[28px]">$120</span>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='{{ route('consumer.investments.checkout') }}'"
+                        class="w-full py-6 bg-magenta text-white font-black text-[20px] uppercase tracking-widest rounded-2xl shadow-xl shadow-magenta/20 hover:bg-magenta/90 transition-all active:scale-[0.99]">
+                        Invest Now
+                    </button>
                 </div>
-                <div class="text-left">
-                    <h4 class="text-2xl font-semibold">$120</h4>
-                    <p class="text-sm text-gray-300">Price per Block</p>
-                </div>
-            </section>
-
-            <!-- ========== Tags Section ========== -->
-            <section class="flex flex-wrap gap-3">
-                <span class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/10 hover:bg-white/20 transition">Genre - Lo-fi</span>
-                <span class="px-4 py-2 rounded-full text-sm bg-white/10 border border-white/10 hover:bg-white/20 transition">BPM - 75</span>
-            </section>
-
-            <!-- ========== Investment Section ========== -->
-            <section class="bg-cardBg rounded-xl p-6 border border-gray-700/50 space-y-5">
-                <h3 class="text-lg font-semibold">Select Blocks to Invest</h3>
-
-                <!-- Quantity Selector -->
-                <div class="flex items-center gap-4">
-                    <button id="decreaseBtn" class="control-btn w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 font-semibold text-lg">−</button>
-                    <span id="quantityDisplay" class="text-2xl font-semibold w-12 text-center">01</span>
-                    <button id="increaseBtn" class="control-btn w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 font-semibold text-lg">+</button>
-                </div>
-            </section>
-
+            </div>
         </div>
+
+        {{-- Back Button --}}
+        <div class="pt-12">
+            <a href="{{ route('consumer.dashboard.index') }}"
+                class="flex items-center gap-3 text-white/40 hover:text-white transition-all font-bold group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+
     </div>
 @endsection

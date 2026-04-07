@@ -1,158 +1,141 @@
 @extends('layouts.app')
 
-<style>
-    .wave-bar {
-        width: 3px;
-        background: rgba(139, 92, 246, 0.25);
-        border-radius: 2px;
-        transition: height 0.1s ease, background-color 0.1s ease;
-        pointer-events: none;
-        min-height: 4px;
-    }
-
-    .wave-bar.active {
-        background: linear-gradient(to top, #8B5CF6, #22D3EE);
-    }
-
-    .progress-slider {
-        appearance: none;
-        width: 100%;
-        height: 4px;
-        background: rgba(139, 92, 246, 0.2);
-        border-radius: 2px;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .progress-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-    }
-
-    .progress-slider::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-    }
-
-    .progress-slider::-moz-range-track {
-        background: none;
-        border: none;
-    }
-
-    .volume-slider {
-        appearance: none;
-        width: 100px;
-        height: 4px;
-        background: rgba(139, 92, 246, 0.2);
-        border-radius: 2px;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 10px;
-        height: 10px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-
-    .volume-slider::-moz-range-thumb {
-        width: 10px;
-        height: 10px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-    }
-
-    .control-btn {
-        transition: all 0.2s ease;
-    }
-
-    .control-btn:hover {
-        transform: scale(1.05);
-    }
-
-    .control-btn:active {
-        transform: scale(0.95);
-    }
-</style>
-
 @section('content')
-    {{-- Header --}}
-    <div class="card border border-gray-700 rounded-lg p-6">
-        <div class="card-header flex justify-between items-center mb-8">
-            <p class="text-accent text-xl font-medium">
-                <a href="{{ route('consumer.my.tracks') }}"><i class="fa-solid fa-arrow-left"></i></a>
-                View Track Details
+    <div class="max-w-4xl mx-auto">
+        {{-- Header --}}
+        <div class="flex items-center gap-4 mb-8">
+            <a href="{{ url()->previous() }}" class="text-[#4D61FF] hover:text-[#4D61FF]/80">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </a>
+            <h1 class="text-3xl font-bold text-[#4D61FF]">View Track Details</h1>
+        </div>
+
+        {{-- Visual Waveform Player --}}
+        <div class="relative w-full h-48 rounded-2xl overflow-hidden mb-8 group bg-black">
+            <div
+                class="absolute inset-0 bg-[url('https://picsum.photos/800/200?random=wave2')] bg-cover bg-center opacity-30">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black"></div>
+
+            <div class="relative z-10 h-full flex items-center px-8 gap-6">
+                <button
+                    class="w-14 h-14 rounded-full bg-magenta flex items-center justify-center hover:scale-105 transition shadow-[0_0_20px_rgba(255,0,255,0.5)]">
+                    <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                </button>
+                <div class="flex-1 flex items-center gap-1 h-12">
+                    @foreach(range(1, 60) as $i)
+                        <div class="w-1 bg-[#4D61FF]"
+                            style="height: {{ rand(30, 100) }}%; opacity: {{ $i < 20 ? '100%' : '40%' }}"></div>
+                    @endforeach
+                </div>
+                <span class="text-xl font-bold text-white">02:00</span>
+            </div>
+        </div>
+
+        {{-- Description --}}
+        <div class="mb-8">
+            <h3 class="text-xl font-bold text-white mb-2">Description</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">
+                Lorem ipsum dolor sit amet consectetur. Gravida morbi cras scelerisque tortor etiam dignissim tincidunt
+                pharetra consequat. Diam ac blandit a in pellentesque egestas. Vel consequat sed id eget semper neque risus
+                neque odio. In morbi nisi facilisi faucibus cursus felis faucibus nisi. Odio lectus at dictum ullamcorper
+                sodales semper fames venenatis arcu. Ultricies molestie placerat scelerisque id mattis hendrerit odio et.
+                Porttitor penatibus rhoncus sit odio at eu magna. Dui lectus aenean viverra molestie etiam lacus
+                ullamcorper.
             </p>
         </div>
 
-        <div class="card-body space-y-6 border-t border-gray-700 p-4">
+        {{-- Stats Grid --}}
+        <div class="grid grid-cols-3 gap-12 mb-8">
+            <div>
+                <h4 class="font-bold text-white mb-1">Total blocks</h4>
+                <p class="text-xs text-gray-400">100</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-1">Remaining Blocks</h4>
+                <p class="text-xs text-gray-400">75</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-1">Price per block</h4>
+                <p class="text-xs text-gray-400">$120</p>
+            </div>
+        </div>
 
-            <!-- ========== Creator Section ========== -->
-            <section class="flex items-center gap-4">
-                <img src="https://i.pravatar.cc/100" alt="Creator Avatar"
-                    class="w-14 h-14 rounded-full border border-white/10" />
+        {{-- Tools Used & Genre --}}
+        <div class="flex gap-4 mb-4">
+            <span class="px-4 py-1.5 rounded-full border border-[#4D61FF] text-[#4D61FF] text-xs">Genre - Lo-fi</span>
+            <span class="px-4 py-1.5 rounded-full border border-[#4D61FF] text-[#4D61FF] text-xs">BPM - 75</span>
+        </div>
+        <div class="mb-12">
+            <h4 class="font-bold text-white mb-1">Tools Used</h4>
+            <p class="text-xs text-gray-400">Lorem Ipsum</p>
+        </div>
+
+
+        <hr class="border-gray-800 mb-12">
+
+
+        {{-- Track Meta Data --}}
+        <div class="mb-8">
+            <h3 class="text-xl font-bold text-white mb-6">Track Meta Data</h3>
+            <div class="grid grid-cols-3 gap-12">
                 <div>
-                    <h2 class="text-lg font-semibold">John Smith</h2>
-                    <p class="text-sm text-mutedText">POP Music Expert</p>
+                    <h4 class="font-bold text-white mb-1">BPM</h4>
+                    <p class="text-xs text-gray-400">120</p>
                 </div>
-            </section>
-
-            <!-- ================= Audio Player ================= -->
-            <x-audio link="{{ asset('images/audio.mp3') }}" />
-
-            <!-- ========== Description Section ========== -->
-            <section class="space-y-2">
-                <h3 class="text-lg font-semibold">Description</h3>
-                <p class="text-sm text-mutedText leading-relaxed">
-                    This AI-generated track blends smooth Lo-fi beats with modern pop textures.
-                    Designed for relaxation, productivity, and ambient listening.
-                </p>
-            </section>
-
-            <!-- ========== Metadata Section ========== -->
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-cardBg rounded-xl p-6 border border-gray-700/50">
-                <div class="text-left">
-                    <h4 class="text-2xl font-semibold">100</h4>
-                    <p class="text-sm text-gray-300">Total Blocks</p>
+                <div>
+                    <h4 class="font-bold text-white mb-1">Mood</h4>
+                    <p class="text-xs text-gray-400">Uplifting</p>
                 </div>
-                <div class="text-left">
-                    <h4 class="text-2xl font-semibold">20</h4>
-                    <p class="text-sm text-gray-300">Remaining Blocks</p>
+                <div>
+                    <h4 class="font-bold text-white mb-1">Instrument</h4>
+                    <p class="text-xs text-gray-400">Bass</p>
                 </div>
-                <div class="text-left">
-                    <h4 class="text-2xl font-semibold">$120</h4>
-                    <p class="text-sm text-gray-300">Price per Block</p>
-                </div>
-            </section>
+            </div>
+        </div>
 
-            <!-- Buttons -->
-            <div class="space-y-3">
-                <button onclick="showSuccessModal()"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
-                    Download Track
-                </button>
-                <button
-                    onclick="window.location.href=`{{ route('consumer.my.tracks.agreements') }}`"
-                    class="w-full border border-gray-600 hover:border-gray-400 text-white font-semibold py-3 rounded-lg transition">
-                    View agreement
-                </button>
+        {{-- Collaborators --}}
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Collaborators</h3>
+                <button class="text-[#4D61FF] text-sm hover:underline">Manage</button>
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @for($i = 0; $i < 6; $i++)
+                    <div class="bg-[#1A1A1A] rounded-lg p-3 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <img src="https://i.pravatar.cc/150?img={{ 10 + $i }}" class="w-8 h-8 rounded-full">
+                            <span class="text-xs text-white">Alice</span>
+                        </div>
+                        <span class="text-xs font-bold text-white">50%</span>
+                    </div>
+                @endfor
+            </div>
         </div>
+
+        {{-- Attached Agreement --}}
+        <div class="mb-12">
+            <h3 class="text-xl font-bold text-white mb-4">Attached Agreement & License</h3>
+            <div class="bg-[#1A1A1A] rounded-lg p-4 flex justify-between items-center">
+                <span class="text-white text-sm font-medium">Standard Agreement.pdf</span>
+                <button class="text-[#4D61FF] text-sm hover:underline">View</button>
+            </div>
+        </div>
+
+        {{-- Actions --}}
+        <div class="space-y-4">
+            <button
+                class="w-full py-4 bg-[#4D61FF] hover:bg-[#5a6dff] text-white font-bold rounded-lg transition shadow-lg shadow-[#4D61FF]/20">
+                List track
+            </button>
+            <button
+                class="w-full py-4 bg-transparent border border-gray-600 text-white font-bold rounded-lg hover:bg-gray-800 transition">
+                Distribute to DSPs
+            </button>
+        </div>
+
     </div>
 @endsection

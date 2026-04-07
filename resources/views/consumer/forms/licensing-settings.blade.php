@@ -1,82 +1,99 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="max-w-[1140px] mx-auto pb-20 relative">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-8">
-        <a href="{{ url()->previous() }}" class="text-accent hover:text-accent/80">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 class="text-2xl font-bold text-accent">Licensing Settings</h1>
-    </div>
-
-    <div class="max-w-3xl mx-auto space-y-8">
-        {{-- License Type Selection --}}
-        <div class="grid grid-cols-2 gap-6">
-            <div class="p-6 rounded-2xl bg-[#252525] border-2 border-accent shadow-lg relative overflow-hidden">
-                <div class="absolute top-2 right-2 text-accent">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <h3 class="text-lg font-bold mb-1">Standard License</h3>
-                <p class="text-[10px] text-gray-500 mb-6">Non-exclusive rights for creator use.</p>
-                <div class="text-2xl font-black text-white">$29.00</div>
-            </div>
-
-            <div
-                class="p-6 rounded-2xl bg-[#252525] border border-gray-700 hover:border-gray-500 transition cursor-pointer">
-                <h3 class="text-lg font-bold mb-1">Exclusive License</h3>
-                <p class="text-[10px] text-gray-500 mb-6">Full transfer of rights to the buyer.</p>
-                <div class="text-2xl font-black text-white">$499.00</div>
-            </div>
+        {{-- Top Navigation (Figma Match) --}}
+        <div class="flex items-center gap-6 pt-2 mb-2">
+            <a href="{{ url()->previous() }}" class="text-[#4D61FF] hover:opacity-80 transition-all">
+                <i class="fas fa-arrow-left text-[22px]"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-[34px] font-bold tracking-tight">Set up License</h1>
         </div>
 
-        {{-- Detailed Settings --}}
-        <div class="bg-[#252525] rounded-3xl p-8 shadow-2xl space-y-8">
-            <h2 class="text-lg font-bold border-b border-gray-700 pb-4">Standard License Terms</h2>
+        <p class="text-white/40 text-[17px] font-medium mb-12">
+            Define how others can legally use your track
+        </p>
 
+        {{-- Form Content (Figma Match) --}}
+        <div class="space-y-12 mb-16">
+            {{-- License Title --}}
+            <div class="space-y-4">
+                <label class="text-white text-[16px] font-bold opacity-90 block">License Title</label>
+                <div class="bg-[#141414] rounded-2xl border border-white/[0.03] p-6 flex items-center">
+                    <input type="text" placeholder="Enter license title"
+                        class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
+                </div>
+            </div>
+
+            {{-- License Types --}}
             <div class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h4 class="text-sm font-medium">Allow Commercial Use</h4>
-                        <p class="text-[10px] text-gray-500">Buyer can use content for profit-making projects.</p>
+                <label class="text-white text-[16px] font-bold opacity-90 block">License Types</label>
+                <div class="flex flex-wrap gap-8 items-center">
+                    @foreach(['Personal Use', 'Commercial Use', 'YouTube Monetization', 'Sync Licensing (for ads, TV, etc.)'] as $type)
+                        <label class="flex items-center gap-4 cursor-pointer group">
+                            <input type="checkbox"
+                                class="w-6 h-6 rounded border-none bg-blue-500/10 text-[#4D61FF] focus:ring-0" {{ $loop->first ? 'checked' : '' }}>
+                            <span
+                                class="text-white/40 text-[15px] font-semibold group-hover:text-white transition-colors">{{ $type }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Price & Duration --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="space-y-4">
+                    <label class="text-white text-[16px] font-bold opacity-90 block">Set Price per License</label>
+                    <div class="bg-[#141414] rounded-2xl border border-white/[0.03] p-6">
+                        <input type="text" placeholder="e.g. $5"
+                            class="bg-transparent border-none text-white text-[16px] font-medium p-0 focus:ring-0 w-full placeholder:text-white/10">
                     </div>
-                    <button class="w-12 h-6 rounded-full bg-accent relative transition">
-                        <div class="absolute right-1 top-1 w-4 h-4 rounded-full bg-white"></div>
-                    </button>
                 </div>
 
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h4 class="text-sm font-medium">Attribution Requirement</h4>
-                        <p class="text-[10px] text-gray-500">Buyer must credit Luna Beats when using content.</p>
+                <div class="space-y-4">
+                    <label class="text-white text-[16px] font-bold opacity-90 block">License Duration</label>
+                    <div class="grid grid-cols-4 gap-4">
+                        @foreach(['1 Year', '5 Years', '8 Years', 'Lifetime'] as $d)
+                            <button
+                                class="py-4 rounded-xl border border-white/5 bg-[#141414] text-white/40 text-[13px] font-bold hover:border-[#4D61FF]/40 hover:text-white transition-all {{ $loop->last ? 'bg-[#141414]/50' : '' }}">
+                                {{ $d }}
+                            </button>
+                        @endforeach
                     </div>
-                    <button class="w-12 h-6 rounded-full bg-gray-700 relative transition">
-                        <div class="absolute left-1 top-1 w-4 h-4 rounded-full bg-white"></div>
-                    </button>
                 </div>
+            </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-400 mb-2">Usage Limit</label>
-                    <select
-                        class="w-full bg-[#1A1A1A] border border-gray-700 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition">
-                        <option>Unlimited usage</option>
-                        <option>Single project only</option>
-                        <option>Up to 10 projects</option>
-                    </select>
+            {{-- Smart Contract Editor --}}
+            <div class="space-y-6">
+                <label class="text-white text-[16px] font-bold opacity-90 block">Write smart contract</label>
+                <div class="bg-[#141414] rounded-[32px] border border-white/[0.03] overflow-hidden shadow-2xl">
+                    {{-- Toolbar --}}
+                    <div class="px-8 py-5 border-b border-white/[0.03] flex items-center gap-24">
+                        <div class="flex items-center gap-32">
+                            <i class="fas fa-bold text-white text-[18px] cursor-pointer hover:opacity-70"></i>
+                            <i class="fas fa-italic text-white text-[18px] cursor-pointer hover:opacity-70"></i>
+                        </div>
+                        <div class="flex items-center gap-32">
+                            <i class="fas fa-list-ul text-white text-[20px] cursor-pointer hover:opacity-70"></i>
+                            <i class="fas fa-list-ol text-white text-[20px] cursor-pointer hover:opacity-70"></i>
+                        </div>
+                    </div>
+                    {{-- Content --}}
+                    <div class="p-10 min-h-[240px]">
+                        <p class="text-white text-[16px] font-bold mb-4">1. Grant of Rights</p>
+                        <div class="h-40 w-full"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <button
-            class="w-full py-5 rounded-2xl bg-accent text-white font-bold text-md hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] transition">
-            Save Licensing Terms
-        </button>
-    </div>
+        <div class="pt-10">
+            <button onclick="window.location.href='{{ route('consumer.agreements.preview') }}'"
+                class="w-full py-6 bg-[#4D61FF] text-white font-bold text-[20px] rounded-2xl shadow-xl shadow-[#4D61FF]/10 hover:bg-[#3D51EF] transition-all active:scale-[0.995]">
+                Generate, Preview License
+            </button>
+        </div>
 
+    </div>
 @endsection

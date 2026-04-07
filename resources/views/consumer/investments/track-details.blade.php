@@ -1,181 +1,101 @@
 @extends('layouts.app')
 
-<style>
-    .wave-bar {
-        width: 3px;
-        background: rgba(139, 92, 246, 0.25);
-        border-radius: 2px;
-        transition: height 0.1s ease, background-color 0.1s ease;
-        pointer-events: none;
-        min-height: 4px;
-    }
-
-    .wave-bar.active {
-        background: linear-gradient(to top, #8B5CF6, #22D3EE);
-    }
-
-    .progress-slider {
-        appearance: none;
-        width: 100%;
-        height: 4px;
-        background: rgba(139, 92, 246, 0.2);
-        border-radius: 2px;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .progress-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 12px;
-        height: 12px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-    }
-
-    .progress-slider::-moz-range-thumb {
-        width: 12px;
-        height: 12px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
-    }
-
-    .progress-slider::-moz-range-track {
-        background: none;
-        border: none;
-    }
-
-    .volume-slider {
-        appearance: none;
-        width: 100px;
-        height: 4px;
-        background: rgba(139, 92, 246, 0.2);
-        border-radius: 2px;
-        cursor: pointer;
-        outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-        appearance: none;
-        width: 10px;
-        height: 10px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-
-    .volume-slider::-moz-range-thumb {
-        width: 10px;
-        height: 10px;
-        background: #8B5CF6;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-    }
-
-    .control-btn {
-        transition: all 0.2s ease;
-    }
-
-    .control-btn:hover {
-        transform: scale(1.05);
-    }
-
-    .control-btn:active {
-        transform: scale(0.95);
-    }
-</style>
-
 @section('content')
-    {{-- Header --}}
-    <div class="card border border-gray-700 rounded-lg p-6">
-        <div class="card-header flex justify-between items-center mb-8">
-            <p class="text-accent text-xl font-medium">
-                <a href="{{ route('consumer.my.tracks') }}"><i class="fa-solid fa-arrow-left"></i></a>
-                View Track Details
-            </p>
+    <div class="max-w-[1000px] mx-auto pt-6 pb-20">
+
+        {{-- Header --}}
+        <div class="flex items-center gap-6 mb-12 border-b border-white/5 pb-8">
+            <a href="{{ url()->previous() }}" class="text-[#4D61FF] hover:text-white transition-colors">
+                <i class="fas fa-arrow-left text-2xl"></i>
+            </a>
+            <h1 class="text-[#4D61FF] text-3xl font-bold tracking-tight">View Track Details</h1>
         </div>
 
-        <div class="card-body space-y-6 border-t border-gray-700 p-4">
-
-            <!-- ========== Creator Section ========== -->
-            <section class="flex items-center gap-4">
-                <img src="https://i.pravatar.cc/100" alt="Creator Avatar"
-                    class="w-14 h-14 rounded-full border border-white/10" />
-                <div>
-                    <h2 class="text-lg font-semibold">John Smith</h2>
-                    <p class="text-sm text-mutedText">POP Music Expert</p>
-                </div>
-            </section>
-
-            <!-- ================= Audio Player ================= -->
-           <x-audio link="{{ asset('images/audio.mp3') }}" />
-
-   
-            <div class="mb-12">
-                <h1 class="text-xl font-bold mb-8 border-b border-gray-800 pb-4">Investment Details</h1>
-                
-                <div class="space-y-6">
-                    <!-- Smart Contract ID -->
-                    <div class="flex justify-between items-center ">
-                        <span class="text-gray-300 text-md">Smart Contract ID</span>
-                        <span class="text-gray-400 text-md">#025645687</span>
-                    </div>
-
-                    <!-- License Type -->
-                    <div class="flex justify-between items-center ">
-                        <span class="text-gray-300 ftext-md">License Type</span>
-                        <span class="text-gray-400 text-md">Personal</span>
-                    </div>
-
-                    <!-- Date Licensed -->
-                    <div class="flex justify-between items-center ">
-                        <span class="text-gray-300 text-md">Date Licensed</span>
-                        <span class="text-gray-400 text-md">April 12, 2025</span>
-                    </div>
-
-                    <!-- Price Paid -->
-                    <div class="flex justify-between items-center ">
-                        <span class="text-gray-300 text-md">Price Paid</span>
-                        <span class="text-gray-400 text-md">$120</span>
-                    </div>
-
-                    <!-- Ownership -->
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-300 text-md">Ownership</span>
-                        <span class="text-gray-400 text-md">05% of track revenue</span>
-                    </div>
-
-                    <!-- Investment Status -->
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-300 text-md">Investment Status</span>
-                        <span class="text-green-500 text-md">Active</span>
-                    </div>
-                </div>
+        {{-- Artist Info --}}
+        <div class="flex items-center gap-6 mb-12">
+            <div class="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/10">
+                <img src="https://ui-avatars.com/api/?name=John+Smith&background=4D61FF&color=fff"
+                    class="w-full h-full object-cover">
             </div>
-
-            <!-- Licensing Section -->
             <div>
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold">Licensing</h2>
-                    <div class="border border-purple-600 rounded px-3 py-1">
-                        <span class="text-gray-300">$19</span>
-                    </div>
-                </div>
+                <h2 class="text-white font-bold text-2xl leading-none mb-2">John Smith</h2>
+                <p class="text-white/40 text-base font-medium">POP Music Expert</p>
+            </div>
+        </div>
 
-                <!-- Document -->
-                <div style="background: #252525" class="rounded-lg p-4 flex justify-between items-center">
-                    <span class="text-gray-300">Standard Agreement.pdf</span>
-                    <a href="#" class="text-blue-500 hover:text-blue-400 transition font-medium">View</a>
+        {{-- Player / Visual --}}
+        <div
+            class="relative w-full aspect-[2.8/1] bg-[#141414] rounded-[32px] overflow-hidden mb-12 border border-white/5 group shadow-2xl">
+            {{-- Background Waveform Effect --}}
+            <div class="absolute inset-0 bg-gradient-to-br from-[#141414] via-[#2A1A3A] to-[#141414] opacity-80"></div>
+
+            {{-- Waveform Bars (Refinement) --}}
+            <div class="absolute inset-x-12 inset-y-16 flex items-center justify-center gap-[4px] opacity-60">
+                @for($i = 0; $i < 60; $i++)
+                    <div class="w-[3px] bg-[#4D61FF] rounded-full" style="height: {{ rand(15, 100) }}%"></div>
+                @endfor
+            </div>
+
+            {{-- Play Button --}}
+            <button
+                class="absolute left-10 bottom-10 w-14 h-14 bg-magenta rounded-full flex items-center justify-center text-white shadow-[0_0_30px_rgba(214,0,214,0.4)] hover:scale-110 active:scale-95 transition-all z-10">
+                <i class="fas fa-play ml-1 text-xl"></i>
+            </button>
+
+            {{-- Time --}}
+            <span class="absolute right-10 bottom-12 text-white font-bold tracking-widest text-2xl z-10">02:00</span>
+        </div>
+
+        {{-- Investment Details --}}
+        <div class="space-y-12">
+            <div class="border-b border-white/5 pb-10">
+                <h3 class="text-white font-bold text-xl mb-8">Investment Details</h3>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center text-base">
+                        <span class="text-white font-bold">Smart Contract ID</span>
+                        <span class="text-white/40 font-medium">#025645687</span>
+                    </div>
+                    <div class="flex justify-between items-center text-base">
+                        <span class="text-white font-bold">License Type</span>
+                        <span class="text-white/40 font-medium">Personal</span>
+                    </div>
+                    <div class="flex justify-between items-center text-base">
+                        <span class="text-white font-bold">Date Licensed</span>
+                        <span class="text-white/40 font-medium">April 12, 2025</span>
+                    </div>
+                    <div class="flex justify-between items-center text-base">
+                        <span class="text-white font-bold">Price Paid</span>
+                        <span class="text-white/40 font-medium">$120</span>
+                    </div>
+                    <div class="flex justify-between items-center text-base">
+                        <span class="text-white font-bold">Ownership</span>
+                        <span class="text-white/40 font-medium">05% of track revenue</span>
+                    </div>
+                    <div class="flex justify-between items-center text-base">
+                        <span class="text-white font-bold">Investment Status</span>
+                        <span class="text-[#22C55E] font-bold">Active</span>
+                    </div>
                 </div>
             </div>
 
+            {{-- Licensing --}}
+            <div>
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-white font-bold text-xl">Licensing</h3>
+                    <div class="bg-[#1A1A1A] px-5 py-2 rounded-lg border border-white/5">
+                        <span class="text-white font-bold text-lg leading-none tracking-tight">$19</span>
+                    </div>
+                </div>
 
+                <div
+                    class="bg-[#1A1A1A] rounded-[24px] px-8 py-6 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors group cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <i class="far fa-file-pdf text-[#4D61FF] text-xl"></i>
+                        <span class="text-white font-medium text-lg">Standard Agreement.pdf</span>
+                    </div>
+                    <button class="text-[#4D61FF] font-bold text-lg group-hover:underline">View</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
-
